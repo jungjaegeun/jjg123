@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>불안 관리 앱</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
+</head>
+<body>
+    <header>
+        <div id="auth-buttons"></div>
+    </header>
+    <div class="container">
+        <h1>불안 관리 앱</h1>
+        <nav id="main-nav">
+            <button onclick="showSection('main')">메인</button>
+            <button onclick="showSection('panic')">공황 버튼</button>
+            <button onclick="showSection('meditation')">명상</button>
+            <button onclick="showSection('walk')">산책</button>
+            <button onclick="showSection('diary')">감정 일기</button>
+            <button onclick="showSection('community')">커뮤니티</button>
+        </nav>
+        <div id="content"></div>
+    </div>
+    <div id="popup" class="popup hidden">
+        <div class="popup-content">
+            <span class="close" onclick="closePopup()">&times;</span>
+            <div id="popup-form"></div>
+        </div>
+    </div>
+    <script type="module">
+        // Firebase SDK 임포트
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-analytics.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } 
+        from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+
+        // Firebase 설정
+        const firebaseConfig = {
+            apiKey: "AIzaSyDbBLoL_dOumssrdaNBbjm0zcOyn3Vd5go",
+            authDomain: "panic-disorder.firebaseapp.com",
+            projectId: "panic-disorder",
+            storageBucket: "panic-disorder.appspot.com",
+            messagingSenderId: "306664195307",
+            appId: "1:306664195307:web:b549339897b7b10407eaae",
+            measurementId: "G-ZNJ874KQXQ"
+        };
+
+        // Firebase 초기화
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+
+        // 전역 변수로 선언하여 다른 스크립트에서 접근 가능하게 함
+        window.firebaseAuth = auth;
+        window.firebaseCreateUserWithEmailAndPassword = createUserWithEmailAndPassword;
+        window.firebaseSignInWithEmailAndPassword = signInWithEmailAndPassword;
+        window.firebaseSignOut = signOut;
+        window.firebaseOnAuthStateChanged = onAuthStateChanged;
+        window.firebaseGoogleAuthProvider = GoogleAuthProvider;
+        window.firebaseSignInWithPopup = signInWithPopup;
+
+        // Firebase 연결 확인
+        console.log("Firebase가 성공적으로 초기화되었습니다.");
+
+        // initApp 함수를 전역 스코프에 추가
+        window.initApp = function() {
+            showMainPage();
+            updateAuthButtons();
+        }
+
+        // DOMContentLoaded 이벤트에 initApp 연결
+        document.addEventListener('DOMContentLoaded', window.initApp);
+        
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>

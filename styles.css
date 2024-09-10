@@ -212,3 +212,44 @@ button:hover {
   height: 100px;
   margin-bottom: 10px;
 }
+
+#character-container {
+  position: relative;
+  width: 200px;
+  margin: 20px auto;
+}
+
+#comforting-character {
+  width: 100%;
+  cursor: pointer;
+}
+
+#speech-bubble {
+  position: absolute;
+  background-color: #fff;
+  border-radius: 20px;
+  padding: 10px;
+  max-width: 200px;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+#speech-bubble:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border: 20px solid transparent;
+  border-top-color: #fff;
+  border-bottom: 0;
+  margin-left: -20px;
+  margin-bottom: -20px;
+}
+
+.hidden {
+  display: none;
+}

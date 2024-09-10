@@ -2,20 +2,7 @@ let currentInterval;
 let currentAudio;
 
 const panicMethods = [
-    {
-        title: "5-4-3-2-1 그라운딩 기법",
-        steps: [
-            { text: "안전한 자세 취하기", duration: 10 },
-            { text: "호흡 안정화", duration: 30 },
-            { text: "5가지 보기", duration: 30 },
-            { text: "4가지 만지기", duration: 30 },
-            { text: "3가지 듣기", duration: 30 },
-            { text: "2가지 냄새 맡기", duration: 20 },
-            { text: "1가지 맛보기", duration: 20 },
-            { text: "현재 순간 인식하기", duration: 20 },
-            { text: "점진적 안정", duration: 30 }
-        ]
-    },
+    
     {
         title: "단계별 공황발작 대처법",
         steps: [
@@ -73,20 +60,27 @@ function showSection(section) {
 }
 
 function showMainPage() {
-    const content = document.getElementById('content');
-    content.innerHTML = `
-        <h2>오늘의 기분은 어떠신가요?</h2>
-        <div id="mood-buttons">
-            <button class="mood-button mood-1" onclick="selectMood(1)">😢</button>
-            <button class="mood-button mood-2" onclick="selectMood(2)">😐</button>
-            <button class="mood-button mood-3" onclick="selectMood(3)">🙂</button>
-            <button class="mood-button mood-4" onclick="selectMood(4)">😄</button>
-            <button class="mood-button mood-5" onclick="selectMood(5)">😍</button>
-        </div>
-        <h2>이번 달 기분 달력</h2>
-        <div id="calendar"></div>
-    `;
-    updateCalendar();
+  const content = document.getElementById('content');
+  content.innerHTML = `
+    <h2>오늘의 기분은 어떠신가요?</h2>
+    <div id="mood-buttons">
+      <button class="mood-button mood-1" onclick="selectMood(1)">😢</button>
+      <button class="mood-button mood-2" onclick="selectMood(2)">😐</button>
+      <button class="mood-button mood-3" onclick="selectMood(3)">🙂</button>
+      <button class="mood-button mood-4" onclick="selectMood(4)">😄</button>
+      <button class="mood-button mood-5" onclick="selectMood(5)">😍</button>
+    </div>
+    <div id="character-container">
+      <img id="comforting-character" src="image.png" alt="Comforting Character">
+      <div id="speech-bubble" class="hidden">
+        <p id="comfort-message"></p>
+      </div>
+    </div>
+    <h2>이번 달 기분 달력</h2>
+    <div id="calendar"></div>
+  `;
+  updateCalendar();
+  showComfortMessage();  // 추가
 }
 
 function showPanicPage() {
@@ -653,10 +647,241 @@ function loadPosts() {
     });
 }
 
+const comfortMessages = [
+  "당신은 잘하고 있어요.",
+  "힘든 시간도 지나갈 거예요.",
+  "오늘 하루도 수고 많으셨어요.",
+  "당신은 소중한 사람이에요.",
+  "한 걸음씩 천천히 나아가세요.",
+  "깊은 숨을 쉬어보세요.",
+  "당신은 혼자가 아닙니다.",
+  "지금 이 순간에 집중해보세요.",
+  "작은 것에 감사해보세요.",
+  "당신의 감정은 모두 valid해요."
+];
+
+function showComfortMessage() {
+  const character = document.getElementById('comforting-character');
+  const speechBubble = document.getElementById('speech-bubble');
+  const comfortMessage = document.getElementById('comfort-message');
+
+  character.addEventListener('click', () => {
+    const randomMessage = comfortMessages[Math.floor(Math.random() * comfortMessages.length)];
+    comfortMessage.textContent = randomMessage;
+    speechBubble.classList.remove('hidden');
+
+    // 3초 후 말풍선 숨기기
+    setTimeout(() => {
+      speechBubble.classList.add('hidden');
+    }, 3000);
+  });
+}
+
 function initApp() {
-    showMainPage();
-    updateAuthButtons();
-    loadPosts();
+  showMainPage();
+  updateAuthButtons();
+  loadPosts();
+  showComfortMessage();  // 추가
+}
+
+function recordPanicSymptoms() {
+    const content = document.getElementById('content');
+    content.innerHTML = `
+        <h2>공황 증상 기록</h2>
+        <form id="panic-symptom-form">
+            <input type="date" id="symptom-date" required>
+            <input type="time" id="symptom-time" required>
+            <input type="number" id="symptom-duration" placeholder="지속 시간(분)" required>
+            <select id="symptom-intensity" required>
+                <option value="">증상 강도 선택</option>
+                <option value="1">1 - 매우 약함</option>
+                <option value="2">2 - 약함</option>
+                <option value="3">3 - 보통</option>
+                <option value="4">4 - 강함</option>
+                <option value="5">5 - 매우 강함</option>
+            </select>
+            <textarea id="symptom-description" placeholder="증상 설명" required></textarea>
+            <button type="submit">기록 저장</button>
+        </form>
+    `;
+
+    document.getElementById('panic-symptom-form').addEventListener('submit', savePanicSymptom);
+}
+
+async function savePanicSymptom(event) {
+    event.preventDefault();
+    const symptom = {
+        date: document.getElementById('symptom-date').value,
+        time: document.getElementById('symptom-time').value,
+        duration: document.getElementById('symptom-duration').value,
+        intensity: document.getElementById('symptom-intensity').value,
+        description: document.getElementById('symptom-description').value
+    };
+
+    let symptoms = await localforage.getItem('panicSymptoms') || [];
+    symptoms.push(symptom);
+    await localforage.setItem('panicSymptoms', symptoms);
+
+    alert('공황 증상이 기록되었습니다.');
+    showPanicPage();
+}
+
+// 호흡 조절 연습 기능
+function startBreathingExercise() {
+    stopCurrentActivity();
+    const content = document.getElementById('content');
+    content.innerHTML = `
+        <h2>호흡 조절 연습</h2>
+        <div id="breathing-instruction"></div>
+        <div id="breathing-timer"></div>
+        <button onclick="stopBreathingExercise()">종료</button>
+    `;
+
+    let phase = 'inhale';
+    let count = 4;
+
+    function updateBreathingUI() {
+        const instruction = document.getElementById('breathing-instruction');
+        const timer = document.getElementById('breathing-timer');
+
+        instruction.textContent = phase === 'inhale' ? '들이쉬세요' : '내쉬세요';
+        timer.textContent = count;
+
+        count--;
+        if (count < 0) {
+            phase = phase === 'inhale' ? 'exhale' : 'inhale';
+            count = phase === 'inhale' ? 4 : 6;
+        }
+    }
+
+    updateBreathingUI();
+    currentInterval = setInterval(updateBreathingUI, 1000);
+}
+
+function stopBreathingExercise() {
+    stopCurrentActivity();
+    showPanicPage();
+}
+
+// 점진적 근육 이완법 기능
+function startProgressiveRelaxation() {
+    stopCurrentActivity();
+    const content = document.getElementById('content');
+    content.innerHTML = `
+        <h2>점진적 근육 이완법</h2>
+        <div id="relaxation-instruction"></div>
+        <div id="relaxation-timer"></div>
+        <button onclick="stopProgressiveRelaxation()">종료</button>
+    `;
+
+    const muscleGroups = [
+        '손과 팔', '얼굴', '목과 어깨', '가슴과 복부', '다리와 발'
+    ];
+    let currentGroup = 0;
+    let phase = 'tense';
+    let count = 5;
+
+    function updateRelaxationUI() {
+        const instruction = document.getElementById('relaxation-instruction');
+        const timer = document.getElementById('relaxation-timer');
+
+        if (currentGroup >= muscleGroups.length) {
+            stopProgressiveRelaxation();
+            return;
+        }
+
+        instruction.textContent = `${muscleGroups[currentGroup]}을(를) ${phase === 'tense' ? '긴장시키세요' : '이완하세요'}`;
+        timer.textContent = count;
+
+        count--;
+        if (count < 0) {
+            if (phase === 'tense') {
+                phase = 'relax';
+                count = 10;
+            } else {
+                currentGroup++;
+                phase = 'tense';
+                count = 5;
+            }
+        }
+    }
+
+    updateRelaxationUI();
+    currentInterval = setInterval(updateRelaxationUI, 1000);
+}
+
+function stopProgressiveRelaxation() {
+    stopCurrentActivity();
+    showPanicPage();
+}
+
+// 그라운딩 기법 연습 기능
+function startGroundingTechnique() {
+    stopCurrentActivity();
+    const content = document.getElementById('content');
+    content.innerHTML = `
+        <h2>5-4-3-2-1 그라운딩 기법</h2>
+        <div id="grounding-instruction"></div>
+        <div id="grounding-timer"></div>
+        <button onclick="stopGroundingTechnique()">종료</button>
+    `;
+
+    const steps = [
+        { text: "보이는 것 5가지를 말해보세요", duration: 30 },
+        { text: "들리는 것 4가지를 말해보세요", duration: 30 },
+        { text: "만질 수 있는 것 3가지를 말해보세요", duration: 30 },
+        { text: "맡을 수 있는 냄새 2가지를 말해보세요", duration: 20 },
+        { text: "맛볼 수 있는 것 1가지를 말해보세요", duration: 20 },
+        { text: "깊게 숨을 쉬세요", duration: 30 }
+    ];
+    let currentStep = 0;
+
+    function updateGroundingUI() {
+        const instruction = document.getElementById('grounding-instruction');
+        const timer = document.getElementById('grounding-timer');
+
+        if (currentStep >= steps.length) {
+            stopGroundingTechnique();
+            return;
+        }
+
+        instruction.textContent = steps[currentStep].text;
+        timer.textContent = steps[currentStep].duration;
+
+        steps[currentStep].duration--;
+        if (steps[currentStep].duration < 0) {
+            currentStep++;
+        }
+    }
+
+    updateGroundingUI();
+    currentInterval = setInterval(updateGroundingUI, 1000);
+}
+
+function stopGroundingTechnique() {
+    stopCurrentActivity();
+    showPanicPage();
+}
+
+// showPanicPage 함수 수정
+function showPanicPage() {
+    const content = document.getElementById('content');
+    content.innerHTML = `
+        <h2>공황 대처 방법</h2>
+        <button onclick="startPanicMethod(1)">단계별 공황발작 대처법</button>
+        <button onclick="recordPanicSymptoms()">공황 증상 기록</button>
+        <button onclick="startBreathingExercise()">호흡 조절 연습</button>
+        <button onclick="startProgressiveRelaxation()">점진적 근육 이완법</button>
+        <button onclick="startGroundingTechnique()">5-4-3-2-1 그라운딩 기법</button>
+        <div id="panic-content" class="hidden">
+            <div id="panic-text"></div>
+            <div id="panic-timer"></div>
+            <div id="panic-progress">
+                <div id="panic-progress-bar"></div>
+            </div>
+        </div>
+        <button onclick="showSection('main')">메인으로 돌아가기</button>
+    `;
 }
 
 window.onload = initApp;

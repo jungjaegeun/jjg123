@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>ADHD 케어 트래커</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#5B6EF5">
+<link rel="stylesheet" href="styles.css">
+<script src="vendor/chart.umd.min.js"></script>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">◐</span>
+    <span class="brand-name">ADHD 케어 트래커</span>
+  </div>
+  <div class="streak-badge" id="streak-badge">🔥 0일 연속 기록</div>
+</header>
+
+<main class="container" id="content"></main>
+
+<nav class="tabbar" id="tabbar">
+  <button class="tab-btn" data-tab="checkin">
+    <span class="tab-icon">📝</span><span>체크인</span>
+  </button>
+  <button class="tab-btn" data-tab="meds">
+    <span class="tab-icon">💊</span><span>복약</span>
+  </button>
+  <button class="tab-btn" data-tab="report">
+    <span class="tab-icon">📊</span><span>리포트</span>
+  </button>
+  <button class="tab-btn" data-tab="community">
+    <span class="tab-icon">💬</span><span>커뮤니티</span>
+  </button>
+</nav>
+
+<div id="toast" class="toast hidden"></div>
+
+<script src="script.js"></script>
+</body>
+</html>

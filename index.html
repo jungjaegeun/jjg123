@@ -1,87 +1,405 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" data-theme="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>불안 관리 앱</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>수원숲정신건강의학과 | 마음이 쉬어가는 숲</title>
+<meta name="description" content="수원숲정신건강의학과 — 우울, 불안·공황, 불면, ADHD, 스트레스. 정신건강의학과 전문의와 함께 편안하게 상담받으세요. 무료 자가진단 제공.">
+<meta name="theme-color" content="#2F6B4F">
+<meta property="og:type" content="website">
+<meta property="og:title" content="수원숲정신건강의학과">
+<meta property="og:description" content="마음이 쉬어가는 숲. 정신건강의학과 전문의 진료 · 무료 자가진단">
+<meta property="og:locale" content="ko_KR">
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="assets/css/styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌲</text></svg>">
 </head>
 <body>
-    <header>
-        <div id="auth-buttons"></div>
-    </header>
-    <div class="container">
-        <h1>불안 관리 앱</h1>
-        <nav id="main-nav">
-            <button onclick="showSection('main')">메인</button>
-            <button onclick="showSection('panic')">공황 버튼</button>
-            <button onclick="showSection('meditation')">명상</button>
-            <button onclick="showSection('walk')">산책</button>
-            <button onclick="showSection('diary')">감정 일기</button>
-            <button onclick="showSection('community')">커뮤니티</button>
-        </nav>
-        <div id="content"></div>
+<a class="skip-link" href="#main">본문 바로가기</a>
+
+<header class="site-header" id="siteHeader">
+  <div class="wrap header-inner">
+    <a class="brand" href="#top">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3 6.5 11h3L5 18h14l-4.5-7h3L12 3Z"/><path d="M12 18v3"/>
+        </svg>
+      </span>
+      <span class="brand-text">
+        <strong>수원숲</strong>
+        <em>정신건강의학과</em>
+      </span>
+    </a>
+
+    <nav class="site-nav" id="siteNav" aria-label="주요 메뉴">
+      <a href="#care">진료 안내</a>
+      <a href="#screening">자가진단</a>
+      <a href="#doctor">의료진</a>
+      <a href="#visit">진료시간·오시는 길</a>
+      <a href="#faq">자주 묻는 질문</a>
+    </nav>
+
+    <div class="header-actions">
+      <button class="icon-btn" id="themeToggle" type="button" aria-label="다크 모드 전환">
+        <svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/></svg>
+        <svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></svg>
+      </button>
+      <a class="btn btn-primary btn-sm tel-link" href="tel:031-000-0000">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>
+        <span>전화 예약</span>
+      </a>
+      <button class="icon-btn menu-btn" id="menuToggle" type="button" aria-label="메뉴 열기" aria-expanded="false" aria-controls="siteNav">
+        <span></span><span></span><span></span>
+      </button>
     </div>
-    <div id="popup" class="popup hidden">
-        <div class="popup-content">
-            <span class="close" onclick="closePopup()">&times;</span>
-            <div id="popup-form"></div>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- HERO -->
+  <section class="hero" id="top">
+    <div class="hero-bg" aria-hidden="true"></div>
+    <div class="wrap hero-inner">
+      <p class="eyebrow">수원 · 정신건강의학과 전문의 진료</p>
+      <h1 class="hero-title">
+        마음이 쉬어가는 숲,<br>
+        <span class="grad">수원숲정신건강의학과</span>
+      </h1>
+      <p class="hero-sub">
+        괜찮은 척하느라 지친 마음에도 그늘이 필요합니다.<br>
+        조용하고 안전한 공간에서, 지금 내 상태를 함께 살펴봐요.
+      </p>
+      <div class="hero-cta">
+        <a class="btn btn-primary btn-lg" href="#screening">
+          무료 자가진단 시작하기
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a class="btn btn-ghost btn-lg" href="#visit">진료시간 · 오시는 길</a>
+      </div>
+      <ul class="hero-badges">
+        <li><span aria-hidden="true">🩺</span> 정신건강의학과 전문의</li>
+        <li><span aria-hidden="true">🔒</span> 비밀 보장 1:1 진료</li>
+        <li><span aria-hidden="true">🌿</span> 편안한 대기 공간</li>
+        <li><span aria-hidden="true">🕘</span> 야간 진료 (예정)</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 이런 마음이라면 -->
+  <section class="section" id="signals">
+    <div class="wrap">
+      <header class="sec-head">
+        <p class="eyebrow">이런 마음이라면</p>
+        <h2>혼자 버티지 않아도 괜찮습니다</h2>
+        <p class="sec-desc">아래 중 하나라도 2주 이상 이어진다면, 한 번쯤 이야기 나눠볼 때입니다.</p>
+      </header>
+      <ul class="signal-grid">
+        <li>“이유 없이 자꾸 눈물이 나요”</li>
+        <li>“심장이 뛰고 숨이 막힐 것 같아요”</li>
+        <li>“누워도 새벽까지 잠이 안 와요”</li>
+        <li>“집중이 안 되고 실수가 잦아요”</li>
+        <li>“출근만 생각하면 가슴이 답답해요”</li>
+        <li>“작은 일에도 화가 폭발해요”</li>
+        <li>“아무것도 하고 싶지 않아요”</li>
+        <li>“확인하고 또 확인하게 돼요”</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 진료 안내 -->
+  <section class="section section-alt" id="care">
+    <div class="wrap">
+      <header class="sec-head">
+        <p class="eyebrow">진료 안내</p>
+        <h2>이런 어려움을 함께 다룹니다</h2>
+        <p class="sec-desc">증상과 상황에 따라 상담·약물치료를 조합해 부담을 최소화한 계획을 세웁니다.</p>
+      </header>
+      <div class="card-grid">
+        <article class="card">
+          <span class="card-ico" aria-hidden="true">🌧️</span>
+          <h3>우울 · 무기력</h3>
+          <p>지속되는 우울감, 흥미 저하, 자책감, 식욕·체중 변화, 죽고 싶은 생각까지 안전하게 다룹니다.</p>
+        </article>
+        <article class="card">
+          <span class="card-ico" aria-hidden="true">💓</span>
+          <h3>불안 · 공황</h3>
+          <p>예기불안, 공황발작, 사회불안, 건강염려. 몸의 증상부터 안정시키는 것을 우선합니다.</p>
+        </article>
+        <article class="card">
+          <span class="card-ico" aria-hidden="true">🌙</span>
+          <h3>불면 · 수면장애</h3>
+          <p>입면 곤란, 잦은 각성, 새벽 각성. 수면위생 교육과 최소 용량 원칙으로 접근합니다.</p>
+        </article>
+        <article class="card">
+          <span class="card-ico" aria-hidden="true">🧩</span>
+          <h3>성인 ADHD · 집중력</h3>
+          <p>주의력 저하, 미루기, 충동성. 자세한 평가 후 필요 시 약물 및 생활 전략을 병행합니다.</p>
+        </article>
+        <article class="card">
+          <span class="card-ico" aria-hidden="true">🔥</span>
+          <h3>스트레스 · 번아웃</h3>
+          <p>직장·학업·육아 스트레스, 소진, 적응장애. 진단서·소견서 상담도 가능합니다.</p>
+        </article>
+        <article class="card">
+          <span class="card-ico" aria-hidden="true">🔁</span>
+          <h3>강박 · 틱</h3>
+          <p>반복되는 확인·정리·오염 강박, 강박사고에 대한 인지행동적 접근과 약물치료.</p>
+        </article>
+        <article class="card">
+          <span class="card-ico" aria-hidden="true">🌊</span>
+          <h3>감정 기복 · 조울</h3>
+          <p>과도한 들뜸과 가라앉음이 반복되는 경우, 경과를 함께 기록하며 조율합니다.</p>
+        </article>
+        <article class="card">
+          <span class="card-ico" aria-hidden="true">🫧</span>
+          <h3>트라우마 · 상실</h3>
+          <p>사고·재난·관계 상처, 애도 반응. 서두르지 않고 안전감을 먼저 회복합니다.</p>
+        </article>
+      </div>
+      <p class="note">※ 진료 내용은 비밀이 보장되며, 본인 동의 없이 외부에 제공되지 않습니다.</p>
+    </div>
+  </section>
+
+  <!-- 자가진단 -->
+  <section class="section" id="screening">
+    <div class="wrap">
+      <header class="sec-head">
+        <p class="eyebrow">무료 자가진단</p>
+        <h2>지금 내 마음, 객관적으로 점검해요</h2>
+        <p class="sec-desc">
+          진료 현장에서 쓰이는 표준화된 선별 척도입니다. 로그인 없이 무료로 이용할 수 있고,
+          응답과 결과는 <strong>내 브라우저에만 저장</strong>되며 서버로 전송되지 않습니다.
+        </p>
+      </header>
+
+      <div class="test-grid" id="testGrid"><!-- JS로 렌더링 --></div>
+
+      <div class="disclaimer">
+        <span aria-hidden="true">ℹ️</span>
+        <p>자가진단 결과는 <strong>진단이 아닌 선별(screening) 참고 자료</strong>입니다. 점수가 낮아도 힘들다면 진료를 받아보시고,
+        점수가 높다고 해서 곧바로 질환이 있는 것은 아닙니다. 정확한 평가는 전문의 면담이 필요합니다.</p>
+      </div>
+
+      <div class="crisis">
+        <strong>지금 많이 위험하다고 느껴진다면</strong>
+        <p>자살예방 상담전화 <a href="tel:109">109</a> · 정신건강 위기상담 <a href="tel:1577-0199">1577-0199</a> · 응급상황 <a href="tel:119">119</a> (24시간)</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 의료진 -->
+  <section class="section section-alt" id="doctor">
+    <div class="wrap">
+      <header class="sec-head">
+        <p class="eyebrow">의료진 소개</p>
+        <h2>끝까지 듣는 진료를 약속합니다</h2>
+      </header>
+      <div class="doctor">
+        <div class="doctor-photo" aria-hidden="true">
+          <svg viewBox="0 0 200 200" role="img">
+            <defs><linearGradient id="dg" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="var(--accent-soft)"/><stop offset="100%" stop-color="var(--accent-weak)"/>
+            </linearGradient></defs>
+            <rect width="200" height="200" rx="24" fill="url(#dg)"/>
+            <circle cx="100" cy="80" r="30" fill="var(--accent)" opacity=".28"/>
+            <path d="M45 165c8-32 28-48 55-48s47 16 55 48Z" fill="var(--accent)" opacity=".28"/>
+          </svg>
         </div>
-        
-        <div id="character-container">
-          <img id="comforting-character" src="image.png" alt="Comforting Character">
-          <div id="speech-bubble" class="hidden">
-            <p id="comfort-message"></p>
+        <div class="doctor-body">
+          <h3>원장 <span class="ph">○○○</span> <small>정신건강의학과 전문의</small></h3>
+          <p class="doctor-quote">“증상보다 먼저, 그 사람이 지나온 시간을 봅니다. 약을 늘리는 것보다 필요한 만큼만 쓰는 진료를 지향합니다.”</p>
+          <ul class="doctor-list">
+            <li><span class="ph">○○</span>대학교 의과대학 졸업</li>
+            <li><span class="ph">○○</span>대학교병원 정신건강의학과 전공의 수료</li>
+            <li>대한신경정신의학회 정회원</li>
+            <li>대한정신약물학회 · 대한불안의학회 회원</li>
+            <li>前 <span class="ph">○○</span>정신건강복지센터 자문의</li>
+          </ul>
+          <p class="note">※ <span class="ph">○○</span> 표기는 실제 정보로 교체가 필요한 부분입니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 진료시간 / 오시는 길 -->
+  <section class="section" id="visit">
+    <div class="wrap">
+      <header class="sec-head">
+        <p class="eyebrow">진료시간 · 오시는 길</p>
+        <h2>편하게 들르실 수 있도록</h2>
+      </header>
+      <div class="visit-grid">
+        <div class="panel">
+          <h3>진료시간</h3>
+          <table class="hours">
+            <tbody>
+              <tr><th>월 · 화 · 목 · 금</th><td>09:30 – 18:30</td></tr>
+              <tr><th>수요일 (야간)</th><td>09:30 – 20:30</td></tr>
+              <tr><th>토요일</th><td>09:30 – 13:30</td></tr>
+              <tr class="off"><th>일요일 · 공휴일</th><td>휴진</td></tr>
+              <tr class="lunch"><th>점심시간</th><td>13:00 – 14:00</td></tr>
+            </tbody>
+          </table>
+          <p class="note">※ 첫 방문(초진)은 상담 시간이 길어 <strong>예약 후 방문</strong>을 권해드립니다. 마감 30분 전까지 접수해 주세요.</p>
+        </div>
+        <div class="panel">
+          <h3>오시는 길</h3>
+          <dl class="info-list">
+            <dt>주소</dt><dd><span class="ph">경기도 수원시 ○○구 ○○로 000, 0층</span></dd>
+            <dt>대표번호</dt><dd><a href="tel:031-000-0000">031-000-0000</a></dd>
+            <dt>지하철</dt><dd><span class="ph">○○역 0번 출구</span>에서 도보 0분</dd>
+            <dt>주차</dt><dd>건물 지하 주차장 이용 (진료 시 <span class="ph">0</span>시간 무료)</dd>
+          </dl>
+          <div class="map-placeholder">
+            <span aria-hidden="true">🗺️</span>
+            <p>지도 영역 — 네이버/카카오 지도 iframe을 넣을 자리입니다.</p>
           </div>
         </div>
-        
+      </div>
     </div>
-    <script type="module">
-        // Firebase SDK 임포트
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-analytics.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } 
-        from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+  </section>
 
-        // Firebase 설정
-        const firebaseConfig = {
-            apiKey: "AIzaSyDbBLoL_dOumssrdaNBbjm0zcOyn3Vd5go",
-            authDomain: "panic-disorder.firebaseapp.com",
-            projectId: "panic-disorder",
-            storageBucket: "panic-disorder.appspot.com",
-            messagingSenderId: "306664195307",
-            appId: "1:306664195307:web:b549339897b7b10407eaae",
-            measurementId: "G-ZNJ874KQXQ"
-        };
+  <!-- 셀프케어 앱 -->
+  <section class="section section-alt" id="selfcare">
+    <div class="wrap">
+      <div class="promo">
+        <div class="promo-body">
+          <p class="eyebrow">진료실 밖에서도</p>
+          <h2>불안 관리 셀프케어 앱</h2>
+          <p>공황이 올라올 때 누르는 <strong>공황 버튼</strong>, 호흡 명상, 산책 기록, 감정 일기까지.
+             진료와 함께 일상에서 마음을 돌보세요.</p>
+          <a class="btn btn-primary" href="app/index.html">앱 열어보기</a>
+        </div>
+        <div class="promo-art" aria-hidden="true">
+          <div class="bubble b1">🫁 호흡</div>
+          <div class="bubble b2">🚶 산책</div>
+          <div class="bubble b3">📓 감정 일기</div>
+          <div class="bubble b4">🆘 공황 버튼</div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        // Firebase 초기화
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-        const auth = getAuth(app);
+  <!-- FAQ -->
+  <section class="section" id="faq">
+    <div class="wrap">
+      <header class="sec-head">
+        <p class="eyebrow">자주 묻는 질문</p>
+        <h2>망설이게 되는 것들</h2>
+      </header>
+      <div class="faq-list">
+        <details>
+          <summary>정신과 진료 기록이 남으면 취업이나 보험에 불이익이 있나요?</summary>
+          <div class="faq-a">
+            <p>진료 기록은 의료법상 비밀이 보장되며, 본인 동의 없이 회사·학교·가족에게 제공되지 않습니다.
+            공무원·전문직 채용에서 정신과 진료 이력만으로 결격이 되지는 않습니다.
+            보험 가입 시 고지 의무가 있는 경우가 있어, 걱정되신다면 첫 진료 때 편하게 말씀해 주세요.
+            보험 청구 없이 진료받는 방법도 함께 안내드립니다.</p>
+          </div>
+        </details>
+        <details>
+          <summary>꼭 약을 먹어야 하나요?</summary>
+          <div class="faq-a">
+            <p>아닙니다. 증상의 정도와 일상 기능에 따라 상담·생활 습관 조정만으로 시작하기도 합니다.
+            약이 필요한 경우에도 <strong>가장 낮은 용량에서 시작해 반응을 보며</strong> 조절하고,
+            중단 시점도 함께 계획합니다. 원하지 않는 치료를 강요하지 않습니다.</p>
+          </div>
+        </details>
+        <details>
+          <summary>첫 진료는 얼마나 걸리나요? 무엇을 준비하면 되나요?</summary>
+          <div class="faq-a">
+            <p>초진은 보통 20~30분 정도 소요됩니다. 신분증과, 복용 중인 약이 있다면 약 봉투나 처방전을 가져오시면 좋습니다.
+            언제부터 어떤 어려움이 있었는지 메모해 오시면 진료가 한결 수월합니다.
+            홈페이지 자가진단 결과를 캡처해 오셔도 됩니다.</p>
+          </div>
+        </details>
+        <details>
+          <summary>가족이 진료를 거부합니다. 보호자만 상담받을 수 있나요?</summary>
+          <div class="faq-a">
+            <p>가능합니다. 보호자 상담을 통해 대화 방법, 병원 방문을 권유하는 방식, 위기 상황 대처를 안내드립니다.
+            다만 본인 진료 없이 처방은 이루어질 수 없습니다.</p>
+          </div>
+        </details>
+        <details>
+          <summary>진료비는 어느 정도인가요?</summary>
+          <div class="faq-a">
+            <p>대부분의 정신건강의학과 진료는 건강보험이 적용됩니다. 초진 상담과 처방 여부에 따라 달라지므로,
+            정확한 금액은 전화(<a href="tel:031-000-0000">031-000-0000</a>)로 문의해 주세요.
+            검사·진단서 등 비급여 항목은 시행 전에 반드시 안내드립니다.</p>
+          </div>
+        </details>
+        <details>
+          <summary>자가진단 결과가 저장되나요?</summary>
+          <div class="faq-a">
+            <p>응답과 점수는 이용하시는 <strong>브라우저(localStorage)에만</strong> 저장되며 병원 서버로 전송되지 않습니다.
+            공용 PC를 쓰셨다면 결과 화면의 ‘기록 삭제’로 지울 수 있습니다.</p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
 
-        // 전역 변수로 선언하여 다른 스크립트에서 접근 가능하게 함
-        window.firebaseAuth = auth;
-        window.firebaseCreateUserWithEmailAndPassword = createUserWithEmailAndPassword;
-        window.firebaseSignInWithEmailAndPassword = signInWithEmailAndPassword;
-        window.firebaseSignOut = signOut;
-        window.firebaseOnAuthStateChanged = onAuthStateChanged;
-        window.firebaseGoogleAuthProvider = GoogleAuthProvider;
-        window.firebaseSignInWithPopup = signInWithPopup;
+  <!-- CTA -->
+  <section class="cta-band">
+    <div class="wrap">
+      <h2>오늘 하루도 애쓰셨습니다</h2>
+      <p>이야기할 준비가 되셨다면, 편하게 연락 주세요.</p>
+      <div class="cta-actions">
+        <a class="btn btn-invert btn-lg" href="tel:031-000-0000">031-000-0000 전화하기</a>
+        <a class="btn btn-outline btn-lg" href="#screening">자가진단부터 해보기</a>
+      </div>
+    </div>
+  </section>
+</main>
 
-        // Firebase 연결 확인
-        console.log("Firebase가 성공적으로 초기화되었습니다.");
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <div class="foot-brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3 6.5 11h3L5 18h14l-4.5-7h3L12 3Z"/><path d="M12 18v3"/>
+        </svg>
+      </span>
+      <p><strong>수원숲정신건강의학과의원</strong><br>마음이 쉬어가는 숲</p>
+    </div>
+    <div class="foot-info">
+      <p><span class="ph">경기도 수원시 ○○구 ○○로 000, 0층</span></p>
+      <p>대표번호 <a href="tel:031-000-0000">031-000-0000</a> · 팩스 <span class="ph">031-000-0000</span></p>
+      <p>대표자 <span class="ph">○○○</span> · 사업자등록번호 <span class="ph">000-00-00000</span></p>
+    </div>
+    <nav class="foot-nav" aria-label="푸터 메뉴">
+      <a href="#care">진료 안내</a>
+      <a href="#screening">자가진단</a>
+      <a href="#visit">오시는 길</a>
+      <a href="app/index.html">셀프케어 앱</a>
+    </nav>
+  </div>
+  <div class="wrap foot-bottom">
+    <p>© <span id="year">2026</span> 수원숲정신건강의학과의원. All rights reserved.</p>
+    <p class="foot-note">본 홈페이지의 정보는 일반적인 건강 정보이며 개별적인 의학적 진단·처방을 대신하지 않습니다.</p>
+  </div>
+</footer>
 
-        // initApp 함수를 전역 스코프에 추가
-        window.initApp = function() {
-            showMainPage();
-            updateAuthButtons();
-        }
+<!-- 자가진단 실행 화면 -->
+<div class="quiz-overlay" id="quizOverlay" role="dialog" aria-modal="true" aria-labelledby="quizTitle" hidden>
+  <div class="quiz-panel">
+    <header class="quiz-head">
+      <div>
+        <p class="quiz-kicker" id="quizKicker"></p>
+        <h2 id="quizTitle"></h2>
+      </div>
+      <button class="icon-btn" id="quizClose" type="button" aria-label="닫기">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </header>
+    <div class="quiz-progress"><div class="quiz-bar" id="quizBar"></div></div>
+    <div class="quiz-body" id="quizBody"></div>
+  </div>
+</div>
 
-        // DOMContentLoaded 이벤트에 initApp 연결
-        document.addEventListener('DOMContentLoaded', window.initApp);
-        
-    </script>
-    <script src="script.js"></script>
+<script src="assets/js/screenings.js"></script>
+<script src="assets/js/main.js"></script>
 </body>
 </html>

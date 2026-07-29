@@ -178,6 +178,12 @@ button {
 
 .brand { display: flex; align-items: center; gap: 9px; flex: none; }
 .brand-mark { width: 36px; height: 36px; flex: none; color: var(--accent); }
+
+/* 로고 자리: 이미지 파일이 있으면 이미지를, 없으면 바로 뒤의 SVG를 씁니다.
+   이미지 로드에 실패하면 onerror 가 <img> 를 제거해 SVG 가 드러납니다. */
+.logo-slot { display: inline-flex; flex: none; }
+.logo-slot img { width: 36px; height: 36px; object-fit: contain; }
+.logo-slot img + svg { display: none; }
 .brand-text { display: flex; flex-direction: column; line-height: 1.2; }
 .brand-text strong { font-size: 1.04rem; letter-spacing: -.045em; }
 .brand-text strong b { color: var(--accent); }
@@ -366,7 +372,10 @@ button {
   background: var(--surface); border: 1px solid var(--line);
   border-radius: var(--r-lg); padding: clamp(24px, 4vw, 40px);
 }
+.doctor-photo img,
 .doctor-photo svg { display: block; width: 100%; height: auto; border-radius: var(--r-md); }
+.doctor-photo img { aspect-ratio: 1; object-fit: cover; object-position: top center; }
+.doctor-photo img + svg { display: none; }
 .doctor-body h3 { font-size: 1.35rem; }
 .doctor-body h3 small { font-size: .82rem; font-weight: 500; color: var(--accent); margin-left: 8px; }
 .doctor-quote {
@@ -374,6 +383,17 @@ button {
   border-left: 3px solid var(--accent-weak);
   color: var(--text-soft); font-size: 1rem; line-height: 1.75;
 }
+.cv {
+  margin-top: 26px; display: grid; gap: 26px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+.cv-col h4 {
+  font-size: .8rem; font-weight: 700; color: var(--accent);
+  letter-spacing: .02em; padding-bottom: 9px;
+  border-bottom: 1px solid var(--line);
+}
+.cv-col .doctor-list { margin-top: 14px; }
+
 .doctor-list { margin-top: 22px; display: grid; gap: 8px; }
 .doctor-list li {
   position: relative; padding-left: 18px;

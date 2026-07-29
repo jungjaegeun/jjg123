@@ -194,6 +194,12 @@ button {
 
 .brand { display: flex; align-items: center; gap: 9px; flex: none; }
 .brand-mark { width: 36px; height: 36px; flex: none; color: var(--accent); }
+
+/* 로고 자리: 이미지 파일이 있으면 이미지를, 없으면 바로 뒤의 SVG를 씁니다.
+   이미지 로드에 실패하면 onerror 가 <img> 를 제거해 SVG 가 드러납니다. */
+.logo-slot { display: inline-flex; flex: none; }
+.logo-slot img { width: 36px; height: 36px; object-fit: contain; }
+.logo-slot img + svg { display: none; }
 .brand-text { display: flex; flex-direction: column; line-height: 1.2; }
 .brand-text strong { font-size: 1.04rem; letter-spacing: -.045em; }
 .brand-text strong b { color: var(--accent); }
@@ -382,7 +388,10 @@ button {
   background: var(--surface); border: 1px solid var(--line);
   border-radius: var(--r-lg); padding: clamp(24px, 4vw, 40px);
 }
+.doctor-photo img,
 .doctor-photo svg { display: block; width: 100%; height: auto; border-radius: var(--r-md); }
+.doctor-photo img { aspect-ratio: 1; object-fit: cover; object-position: top center; }
+.doctor-photo img + svg { display: none; }
 .doctor-body h3 { font-size: 1.35rem; }
 .doctor-body h3 small { font-size: .82rem; font-weight: 500; color: var(--accent); margin-left: 8px; }
 .doctor-quote {
@@ -390,6 +399,17 @@ button {
   border-left: 3px solid var(--accent-weak);
   color: var(--text-soft); font-size: 1rem; line-height: 1.75;
 }
+.cv {
+  margin-top: 26px; display: grid; gap: 26px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+.cv-col h4 {
+  font-size: .8rem; font-weight: 700; color: var(--accent);
+  letter-spacing: .02em; padding-bottom: 9px;
+  border-bottom: 1px solid var(--line);
+}
+.cv-col .doctor-list { margin-top: 14px; }
+
 .doctor-list { margin-top: 22px; display: grid; gap: 8px; }
 .doctor-list li {
   position: relative; padding-left: 18px;
@@ -764,7 +784,11 @@ button {
 <header class="site-header" id="siteHeader">
   <div class="wrap header-inner">
     <a class="brand" href="#top">
-      <svg class="brand-mark" aria-hidden="true"><use href="#logo-mark"/></svg>
+      <!-- assets/img/logo-mark.png 이 있으면 그 이미지를, 없으면 아래 SVG를 사용합니다 -->
+      <span class="logo-slot">
+        <img src="assets/img/logo-mark.png" alt="" onerror="this.remove()">
+        <svg class="brand-mark" aria-hidden="true"><use href="#logo-mark"/></svg>
+      </span>
       <span class="brand-text">
         <strong><b>수원숲</b> <span>정신건강의학과</span></strong>
         <em>Suwon Forest Mental Health Clinic</em>
@@ -937,8 +961,10 @@ button {
         <h2>끝까지 듣는 진료를 약속합니다</h2>
       </header>
       <div class="doctor">
-        <div class="doctor-photo" aria-hidden="true">
-          <svg viewBox="0 0 200 200" role="img">
+        <!-- assets/img/doctor.jpg 가 있으면 그 사진을, 없으면 아래 도형을 사용합니다 -->
+        <div class="doctor-photo">
+          <img src="assets/img/doctor.jpg" alt="원장 정재균 정신건강의학과 전문의" onerror="this.remove()">
+          <svg viewBox="0 0 200 200" aria-hidden="true">
             <defs><linearGradient id="dg" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0%" stop-color="var(--accent-soft)"/><stop offset="100%" stop-color="var(--accent-weak)"/>
             </linearGradient></defs>
@@ -948,16 +974,29 @@ button {
           </svg>
         </div>
         <div class="doctor-body">
-          <h3>원장 <span class="ph">○○○</span> <small>정신건강의학과 전문의</small></h3>
+          <h3>원장 정재균 <small>정신건강의학과 전문의</small></h3>
           <p class="doctor-quote">“증상보다 먼저, 그 사람이 지나온 시간을 봅니다. 약을 늘리는 것보다 필요한 만큼만 쓰는 진료를 지향합니다.”</p>
-          <ul class="doctor-list">
-            <li><span class="ph">○○</span>대학교 의과대학 졸업</li>
-            <li><span class="ph">○○</span>대학교병원 정신건강의학과 전공의 수료</li>
-            <li>대한신경정신의학회 정회원</li>
-            <li>대한정신약물학회 · 대한불안의학회 회원</li>
-            <li>前 <span class="ph">○○</span>정신건강복지센터 자문의</li>
-          </ul>
-          <p class="note">※ <span class="ph">○○</span> 표기는 실제 정보로 교체가 필요한 부분입니다.</p>
+
+          <div class="cv">
+            <div class="cv-col">
+              <h4>학력 · 수련</h4>
+              <ul class="doctor-list">
+                <li>연세대학교 시스템생물학과 졸업</li>
+                <li>경북대학교 의학전문대학원 졸업</li>
+                <li>상계백병원 인턴 수료</li>
+                <li>상계백병원 정신건강의학과 전공의 수료</li>
+              </ul>
+            </div>
+            <div class="cv-col">
+              <h4>주요 경력</h4>
+              <ul class="doctor-list">
+                <li>前 육군 7군단 병역심사관리반 군의관</li>
+                <li>前 지상작전사령부 현역부적합심사위원회 심사위원</li>
+                <li>前 용인정신병원 수련부장 및 진료과장</li>
+                <li>前 여주 삼성신경정신과의원 부원장</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1121,7 +1160,10 @@ button {
 <footer class="site-footer">
   <div class="wrap footer-inner">
     <div class="foot-brand">
-      <svg class="brand-mark" aria-hidden="true"><use href="#logo-mark"/></svg>
+      <span class="logo-slot">
+        <img src="assets/img/logo-mark.png" alt="" onerror="this.remove()">
+        <svg class="brand-mark" aria-hidden="true"><use href="#logo-mark"/></svg>
+      </span>
       <p><strong>수원숲 정신건강의학과의원</strong><br>
          <small>Suwon Forest Mental Health Clinic</small><br>
          마음이 쉬어가는 숲</p>

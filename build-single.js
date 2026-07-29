@@ -26,8 +26,31 @@ html = html
     () => `<script>\n${jsScreenings}\n${jsMain}\n</script>`
   );
 
-if (html.includes('assets/')) {
-  console.error('오류: assets/ 참조가 남아 있습니다. 인라인 처리에 실패했습니다.');
+/* assets/img/ 안의 이미지는 data: URI 로 심어 넣습니다.
+   파일이 없으면 경로를 그대로 두고, 브라우저에서 onerror 가 SVG 대체본을 띄웁니다. */
+const MIME = { '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
+               '.gif': 'image/gif', '.webp': 'image/webp', '.svg': 'image/svg+xml' };
+
+html = html.replace(/src="(assets\/img\/[^"]+)"/g, (whole, rel) => {
+  const file = path.join(root, rel);
+  if (!fs.existsSync(file)) {
+    console.warn(`  · ${rel} 없음 → 기본 도형(SVG)으로 표시됩니다`);
+    return whole;
+  }
+  const mime = MIME[path.extname(file).toLowerCase()];
+  if (!mime) {
+    console.warn(`  · ${rel} 지원하지 않는 형식 → 그대로 둠`);
+    return whole;
+  }
+  const b64 = fs.readFileSync(file).toString('base64');
+  console.log(`  · ${rel} 삽입 완료 (${(b64.length / 1365).toFixed(0)} KB)`);
+  return `src="data:${mime};base64,${b64}"`;
+});
+
+/* 남은 참조가 있으면 인라인에 실패한 것입니다 (assets/img 는 위에서 처리했으므로 제외) */
+const leftover = html.match(/(?:href|src)="assets\/(?!img\/)[^"]*"/g);
+if (leftover) {
+  console.error('오류: 인라인되지 않은 참조가 남아 있습니다 →', leftover);
   process.exit(1);
 }
 

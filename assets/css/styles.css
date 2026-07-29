@@ -300,6 +300,26 @@ button {
 .card p { margin-top: 9px; color: var(--text-soft); font-size: .92rem; line-height: 1.65; }
 
 /* ------------------------------------------------------------ 검사 카드 */
+.test-filter {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-bottom: 22px;
+}
+.filter-chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 16px; border-radius: var(--r-full);
+  border: 1px solid var(--line); background: var(--surface);
+  font-size: .9rem; font-weight: 500; color: var(--text-soft);
+  transition: border-color .16s var(--ease), background-color .16s var(--ease), color .16s var(--ease);
+}
+.filter-chip span {
+  font-size: .74rem; font-weight: 700; color: var(--muted);
+  background: var(--surface-2); padding: 1px 7px; border-radius: var(--r-full);
+}
+.filter-chip:hover { border-color: var(--accent); color: var(--accent); }
+.filter-chip.is-on { background: var(--accent); border-color: var(--accent); color: #fff; }
+[data-theme="dark"] .filter-chip.is-on { color: #0E1412; }
+.filter-chip.is-on span { background: color-mix(in srgb, currentColor 20%, transparent); color: inherit; }
+
 .test-grid {
   display: grid; gap: 16px;
   grid-template-columns: repeat(auto-fit, minmax(288px, 1fr));
@@ -652,6 +672,33 @@ button {
 
 .result-summary { margin-top: 22px; font-size: 1.02rem; font-weight: 600; color: var(--text); }
 .result-advice { margin-top: 10px; font-size: .94rem; color: var(--text-soft); line-height: 1.72; }
+.result-footnote { margin-top: 12px; font-size: .82rem; color: var(--muted); }
+
+/* DASS-21 하위 척도 */
+.subscales { margin-top: 20px; display: grid; gap: 12px; }
+.sub-row {
+  display: grid; align-items: center; gap: 10px;
+  grid-template-columns: 62px minmax(0, 1fr) 62px 64px;
+  text-align: left;
+}
+.sub-name { font-size: .9rem; font-weight: 600; color: var(--text); }
+.sub-meter {
+  height: 8px; border-radius: var(--r-full);
+  background: var(--line); overflow: hidden;
+}
+.sub-meter > span { display: block; height: 100%; background: currentColor; border-radius: var(--r-full); }
+.sub-score { font-size: .88rem; font-weight: 700; color: currentColor; text-align: right; }
+.sub-score small { font-size: .74rem; font-weight: 500; color: var(--muted); }
+.sub-level { font-size: .78rem; font-weight: 600; color: currentColor; text-align: right; }
+
+/* MDQ 판정 */
+.mdq-verdict {
+  display: inline-block; margin-top: 14px;
+  padding: 10px 22px; border-radius: var(--r-full);
+  font-size: 1.15rem; font-weight: 700; color: currentColor;
+  border: 1.5px solid currentColor;
+  background: color-mix(in srgb, currentColor 10%, var(--surface));
+}
 
 .result-alert {
   margin-top: 22px; padding: 18px 20px; text-align: left;

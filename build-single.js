@@ -58,9 +58,5 @@ fs.rmSync(path.join(root, 'dist'), { recursive: true, force: true });
 fs.mkdirSync(path.join(root, 'dist'), { recursive: true });
 fs.writeFileSync(path.join(root, 'dist/index.html'), html);
 
-/* 홈페이지에서 링크하는 셀프케어 앱도 함께 담습니다 */
-fs.cpSync(path.join(root, 'app'), path.join(root, 'dist/app'), { recursive: true });
-
 const kb = (Buffer.byteLength(html) / 1024).toFixed(0);
 console.log(`dist/index.html 생성 완료 (${kb} KB)`);
-console.log('dist/app/ 복사 완료');

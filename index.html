@@ -168,11 +168,13 @@
         <p class="eyebrow">무료 자가진단</p>
         <h2>지금 내 마음, 객관적으로 점검해요</h2>
         <p class="sec-desc">
-          진료 현장에서 쓰이는 표준화된 선별 척도입니다. 로그인 없이 무료로 이용할 수 있고,
-          응답과 결과는 <strong>내 브라우저에만 저장</strong>되며 서버로 전송되지 않습니다.
+          진료 현장과 연구에서 쓰이는 표준화된 선별 척도 <strong>13종</strong>입니다.
+          로그인 없이 무료로 이용할 수 있고, 응답과 결과는
+          <strong>내 브라우저에만 저장</strong>되며 서버로 전송되지 않습니다.
         </p>
       </header>
 
+      <div class="test-filter" id="testFilter" role="group" aria-label="검사 분류"><!-- JS로 렌더링 --></div>
       <div class="test-grid" id="testGrid"><!-- JS로 렌더링 --></div>
 
       <div class="disclaimer">
@@ -329,29 +331,8 @@
     </div>
   </section>
 
-  <!-- 셀프케어 앱 -->
-  <section class="section section-alt" id="selfcare">
-    <div class="wrap">
-      <div class="promo">
-        <div class="promo-body">
-          <p class="eyebrow">진료실 밖에서도</p>
-          <h2>불안 관리 셀프케어 앱</h2>
-          <p>공황이 올라올 때 누르는 <strong>공황 버튼</strong>, 호흡 명상, 산책 기록, 감정 일기까지.
-             진료와 함께 일상에서 마음을 돌보세요.</p>
-          <a class="btn btn-primary" href="app/index.html">앱 열어보기</a>
-        </div>
-        <div class="promo-art" aria-hidden="true">
-          <div class="bubble b1">🫁 호흡</div>
-          <div class="bubble b2">🚶 산책</div>
-          <div class="bubble b3">📓 감정 일기</div>
-          <div class="bubble b4">🆘 공황 버튼</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- FAQ -->
-  <section class="section" id="faq">
+  <section class="section section-alt" id="faq">
     <div class="wrap">
       <header class="sec-head">
         <p class="eyebrow">자주 묻는 질문</p>
@@ -438,8 +419,8 @@
     <nav class="foot-nav" aria-label="푸터 메뉴">
       <a href="#care">진료 안내</a>
       <a href="#screening">자가진단</a>
+      <a href="#doctor">의료진</a>
       <a href="#visit">오시는 길</a>
-      <a href="app/index.html">셀프케어 앱</a>
     </nav>
   </div>
   <div class="wrap foot-bottom">

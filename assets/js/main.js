@@ -83,10 +83,36 @@
 
   /* --------------------------------------------------------- 카드 그리드 */
   const grid = $('#testGrid');
+  const filterBar = $('#testFilter');
+  let activeCat = 'all';
+
+  function renderFilter() {
+    filterBar.innerHTML = CATEGORIES.map(c => {
+      const n = c.id === 'all'
+        ? SCREENINGS.length
+        : SCREENINGS.filter(t => t.category === c.id).length;
+      return `<button type="button" class="filter-chip${c.id === activeCat ? ' is-on' : ''}"
+                      data-cat="${c.id}" aria-pressed="${c.id === activeCat}">
+                ${c.label} <span>${n}</span>
+              </button>`;
+    }).join('');
+  }
+
+  filterBar.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-cat]');
+    if (!btn) return;
+    activeCat = btn.dataset.cat;
+    renderFilter();
+    renderTestGrid();
+  });
 
   function renderTestGrid() {
     const saved = loadResults();
-    grid.innerHTML = SCREENINGS.map(t => {
+    const list = activeCat === 'all'
+      ? SCREENINGS
+      : SCREENINGS.filter(t => t.category === activeCat);
+
+    grid.innerHTML = list.map(t => {
       const prev = saved[t.id];
       const badge = prev
         ? `<p class="test-prev tone-${prev.tone}">지난 결과 · ${prev.level} <span>(${formatDate(prev.date)})</span></p>`
@@ -116,6 +142,7 @@
     if (btn) startTest(btn.dataset.test);
   });
 
+  renderFilter();
   renderTestGrid();
 
   /* ------------------------------------------------------------ 검사 진행 */
@@ -218,36 +245,72 @@
     if (n >= 1 && n <= opts.length) opts[n - 1].click();
   });
 
+  /* 검사 유형별 점수 표시 영역 */
+  function renderScoreBlock(test, result, band) {
+    const unit = test.resultUnit || '점';
+    const label = test.resultLabel || '총점';
+
+    if (test.scoring.type === 'subscales') {
+      return `
+        <p class="result-level">${band.level}</p>
+        <p class="result-label">가장 높게 나온 영역: ${result.worst.label}</p>
+        <div class="subscales">
+          ${result.groups.map(g => `
+            <div class="sub-row tone-${g.band.tone}">
+              <span class="sub-name">${g.label}</span>
+              <span class="sub-meter"><span style="width:${Math.round((g.score / g.max) * 100)}%"></span></span>
+              <span class="sub-score">${g.score}<small>/${g.max}</small></span>
+              <span class="sub-level">${g.band.level}</span>
+            </div>`).join('')}
+        </div>`;
+    }
+
+    if (test.scoring.type === 'mdq') {
+      return `
+        <p class="mdq-verdict">${result.positive ? '선별 기준 충족' : '선별 기준 미충족'}</p>
+        <p class="result-label">해당 증상 ${result.score} / ${result.max}개
+          · 같은 시기 발생 ${answers[test.scoring.clusterIndex] === 1 ? '예' : '아니오'}
+          · 기능 손상 ${['없음', '경미', '중간', '심각'][answers[test.scoring.impairIndex]]}</p>
+        <p class="result-level">${band.level}</p>`;
+    }
+
+    const pct = Math.round((result.score / result.max) * 100);
+    return `
+      <div class="result-score">
+        <span class="score-num">${result.score}</span>
+        <span class="score-max">/ ${result.max}${unit}</span>
+      </div>
+      <p class="result-label">${label}</p>
+      <p class="result-level">${band.level}</p>
+      <div class="result-meter" aria-hidden="true"><span style="width:${pct}%"></span></div>
+      <div class="result-bands">
+        ${test.bands.map(b => `<span class="rb tone-${b.tone}${b === band ? ' is-here' : ''}">${b.level}</span>`).join('')}
+      </div>`;
+  }
+
   function renderResult() {
     setProgress(1);
-    const { score, max } = scoreScreening(current, answers);
-    const band = bandFor(current, score);
-    const pct = Math.round((score / max) * 100);
-    const unit = current.resultUnit || '점';
-    const label = current.resultLabel || '총점';
+    const result = scoreScreening(current, answers);
+    const band = bandFor(current, result);
 
     saveResult(current.id, {
-      score, max, level: band.level, tone: band.tone, date: new Date().toISOString()
+      score: result.score, max: result.max,
+      level: band.level, tone: band.tone, date: new Date().toISOString()
     });
 
     const alertItem = current.alertItem;
     const showAlert = alertItem && answers[alertItem.index] > 0;
 
+    /* 하위 척도형은 밴드에 등급만 있으므로 해설을 tone 별 문구에서 가져옵니다 */
+    const text = band.summary ? band : (current.toneText || {})[band.tone] || { summary: '', advice: '' };
+
     bodyEl.innerHTML = `
       <div class="quiz-result tone-${band.tone}">
         <p class="result-kicker">${current.scale} 결과</p>
-        <div class="result-score">
-          <span class="score-num">${score}</span>
-          <span class="score-max">/ ${max}${unit}</span>
-        </div>
-        <p class="result-label">${label}</p>
-        <p class="result-level">${band.level}</p>
-        <div class="result-meter" aria-hidden="true"><span style="width:${pct}%"></span></div>
-        <div class="result-bands">
-          ${current.bands.map(b => `<span class="rb tone-${b.tone}${b === band ? ' is-here' : ''}">${b.level}</span>`).join('')}
-        </div>
-        <p class="result-summary">${band.summary}</p>
-        <p class="result-advice">${band.advice}</p>
+        ${renderScoreBlock(current, result, band)}
+        <p class="result-summary">${text.summary}</p>
+        <p class="result-advice">${text.advice}</p>
+        ${current.footnote ? `<p class="result-footnote">${current.footnote}</p>` : ''}
 
         ${showAlert ? `
           <div class="result-alert">
@@ -270,8 +333,12 @@
         <div class="result-more">
           <p>다른 검사도 해보시겠어요?</p>
           <div class="more-chips">
-            ${SCREENINGS.filter(t => t.id !== current.id).map(t =>
-              `<button type="button" class="chip" data-next="${t.id}">${t.emoji} ${t.title}</button>`).join('')}
+            ${SCREENINGS
+              .filter(t => t.id !== current.id)
+              .sort((a, b) => (a.category === current.category ? -1 : 0) - (b.category === current.category ? -1 : 0))
+              .slice(0, 5)
+              .map(t => `<button type="button" class="chip" data-next="${t.id}">${t.emoji} ${t.title}</button>`)
+              .join('')}
           </div>
         </div>
 

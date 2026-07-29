@@ -82,6 +82,10 @@
   }
 
   /* --------------------------------------------------------- 카드 그리드 */
+  /* 설문형(임상 척도 + 성향)과 과제형(집중력)을 한 목록으로 합쳐 보여줍니다 */
+  const ALL_TESTS = [...SCREENINGS, ...PROFILES, ...TASKS];
+  const isTask = t => t.category === 'focus';
+
   const grid = $('#testGrid');
   const filterBar = $('#testFilter');
   let activeCat = 'all';
@@ -89,8 +93,8 @@
   function renderFilter() {
     filterBar.innerHTML = CATEGORIES.map(c => {
       const n = c.id === 'all'
-        ? SCREENINGS.length
-        : SCREENINGS.filter(t => t.category === c.id).length;
+        ? ALL_TESTS.length
+        : ALL_TESTS.filter(t => t.category === c.id).length;
       return `<button type="button" class="filter-chip${c.id === activeCat ? ' is-on' : ''}"
                       data-cat="${c.id}" aria-pressed="${c.id === activeCat}">
                 ${c.label} <span>${n}</span>
@@ -109,16 +113,19 @@
   function renderTestGrid() {
     const saved = loadResults();
     const list = activeCat === 'all'
-      ? SCREENINGS
-      : SCREENINGS.filter(t => t.category === activeCat);
+      ? ALL_TESTS
+      : ALL_TESTS.filter(t => t.category === activeCat);
 
     grid.innerHTML = list.map(t => {
       const prev = saved[t.id];
       const badge = prev
         ? `<p class="test-prev tone-${prev.tone}">지난 결과 · ${prev.level} <span>(${formatDate(prev.date)})</span></p>`
         : '';
+      const meta = isTask(t)
+        ? `과제형 · 약 ${t.minutes}분`
+        : `${t.questions.length}문항 · 약 ${t.minutes}분`;
       return `
-        <article class="test-card">
+        <article class="test-card${isTask(t) ? ' is-task' : ''}">
           <div class="test-top">
             <span class="test-ico" aria-hidden="true">${t.emoji}</span>
             <span class="test-scale">${t.label}</span>
@@ -128,9 +135,9 @@
           <p class="test-blurb">${t.blurb}</p>
           ${badge}
           <div class="test-foot">
-            <span class="test-meta">${t.questions.length}문항 · 약 ${t.minutes}분</span>
+            <span class="test-meta">${meta}</span>
             <button class="btn btn-soft btn-sm" type="button" data-test="${t.id}">
-              ${prev ? '다시 검사하기' : '무료로 검사 시작'}
+              ${prev ? '다시 하기' : isTask(t) ? '시작하기' : '무료로 검사 시작'}
             </button>
           </div>
         </article>`;
@@ -166,6 +173,7 @@
   }
 
   function closeOverlay() {
+    if (stopTask) { stopTask(); stopTask = null; }   // 과제형 타이머·이벤트 정리
     overlay.classList.remove('is-open');
     document.body.classList.remove('no-scroll');
     setTimeout(() => { overlay.hidden = true; bodyEl.innerHTML = ''; }, 200);
@@ -179,15 +187,79 @@
     if (e.key === 'Escape' && !overlay.hidden) closeOverlay();
   });
 
+  let stopTask = null;   // 과제형 실행 중 정리 함수
+
   function startTest(id) {
-    current = SCREENINGS.find(t => t.id === id);
+    current = ALL_TESTS.find(t => t.id === id);
     if (!current) return;
+    titleEl.textContent = current.title;
+    openOverlay();
+
+    if (isTask(current)) {
+      kickerEl.textContent = `${current.label} · 과제형`;
+      setProgress(0);
+      startTask();
+      return;
+    }
+
     answers = new Array(current.questions.length).fill(null);
     step = 0;
-    titleEl.textContent = current.title;
     kickerEl.textContent = `${current.label} · ${current.questions.length}문항`;
-    openOverlay();
     renderStep();
+  }
+
+  /* 집중력 과제: 안내 → 실행 → 결과 */
+  function startTask() {
+    const t = current;
+    bodyEl.innerHTML = `
+      <div class="task-intro">
+        <span class="task-ico" aria-hidden="true">${t.emoji}</span>
+        <h3>${t.title}</h3>
+        <p>${t.blurb}</p>
+        <ul class="task-tips">
+          <li>조용한 곳에서, 방해받지 않는 상태로 해주세요.</li>
+          <li>휴대폰보다 <strong>PC나 태블릿</strong>에서 더 정확합니다.</li>
+          <li>결과는 규준에 근거한 평가가 아니라 <strong>이 순간의 기록</strong>입니다.</li>
+        </ul>
+        <button class="btn btn-primary btn-lg" type="button" data-go>시작하기</button>
+      </div>`;
+    $('[data-go]', bodyEl).addEventListener('click', () => {
+      setProgress(0.05);
+      stopTask = TASK_RUNNERS[t.id](bodyEl, renderTaskResult);
+    });
+  }
+
+  function renderTaskResult(r) {
+    setProgress(1);
+    stopTask = null;
+    saveResult(current.id, {
+      score: r.headline, max: null, level: r.level, tone: r.tone, date: new Date().toISOString()
+    });
+
+    bodyEl.innerHTML = `
+      <div class="quiz-result tone-${r.tone}">
+        <p class="result-kicker">${current.label} 결과</p>
+        <div class="result-score"><span class="score-num">${r.headline}</span></div>
+        <p class="result-label">${r.sub}</p>
+        <p class="result-level">${r.level}</p>
+        <div class="task-rows">
+          ${r.rows.map(x => `<div class="task-row"><span>${x.label}</span><b>${x.value}</b></div>`).join('')}
+        </div>
+        <p class="result-advice">${r.note}</p>
+        <div class="result-note">
+          이 과제는 의학적 검사가 아닙니다. 기기 성능·화면 반응 속도·주변 소음에 따라 결과가 크게 달라집니다.
+          실제 인지 기능 평가가 필요하다면 병원에서 시행하는 정식 검사를 받아보세요.
+        </div>
+        <div class="result-actions">
+          <button class="btn btn-primary" type="button" data-retry>다시 하기</button>
+          <button class="btn btn-ghost" type="button" data-close>닫기</button>
+        </div>
+      </div>`;
+
+    $('[data-retry]', bodyEl).addEventListener('click', () => startTest(current.id));
+    $('[data-close]', bodyEl).addEventListener('click', closeOverlay);
+    renderTestGrid();
+    panel.scrollTop = 0;
   }
 
   function setProgress(ratio) {
@@ -238,7 +310,8 @@
 
   /* 숫자 키로 응답 선택 */
   document.addEventListener('keydown', (e) => {
-    if (overlay.hidden || !current || step >= current.questions.length) return;
+    /* 과제형에는 문항이 없으므로 숫자키 선택을 적용하지 않습니다 */
+    if (overlay.hidden || !current || !current.questions || step >= current.questions.length) return;
     const n = Number(e.key);
     if (!n) return;
     const opts = $$('.quiz-opt', bodyEl);
@@ -262,6 +335,65 @@
               <span class="sub-score">${g.score}<small>/${g.max}</small></span>
               <span class="sub-level">${g.band.level}</span>
             </div>`).join('')}
+        </div>`;
+    }
+
+    /* 성격·투자 성향: 차원별 막대 */
+    if (test.scoring.type === 'profile') {
+      return `
+        <p class="result-level">${band.level}</p>
+        <div class="subscales is-profile">
+          ${result.groups.map(g => `
+            <div class="sub-row">
+              <span class="sub-name">${g.label}</span>
+              <span class="sub-meter"><span style="width:${Math.round((g.score / g.max) * 100)}%"></span></span>
+              <span class="sub-score">${g.score}<small>/${g.max}</small></span>
+              <span class="sub-level">${g.level.level}</span>
+            </div>
+            <p class="sub-desc">${g.desc}</p>`).join('')}
+        </div>`;
+    }
+
+    /* 유형 선택: 상위 유형 카드 + 순위 */
+    if (test.scoring.type === 'types') {
+      const topN = test.scoring.topN || 1;
+      const top = result.ranked.slice(0, topN);
+      const code = top.map(t => t.key).join('');
+      return `
+        <div class="type-card">
+          <span class="type-emoji" aria-hidden="true">${result.top.emoji}</span>
+          <p class="type-name">${result.top.label}</p>
+          ${topN > 1 ? `<p class="type-code">상위 유형 코드 · <b>${code}</b></p>` : ''}
+          <p class="type-summary">${result.top.summary}</p>
+          <p class="type-advice">${result.top.advice}</p>
+        </div>
+        <div class="type-rank">
+          ${result.ranked.map((t, i) => `
+            <div class="rank-row${i < topN ? ' is-top' : ''}">
+              <span class="rank-name">${t.emoji} ${t.label}</span>
+              <span class="sub-meter"><span style="width:${Math.round((t.score / t.max) * 100)}%"></span></span>
+              <span class="sub-score">${t.score}<small>/${t.max}</small></span>
+            </div>`).join('')}
+        </div>`;
+    }
+
+    /* 두 축 조합: 유형 + 축별 막대 */
+    if (test.scoring.type === 'axes') {
+      return `
+        <div class="type-card">
+          <p class="type-name">${result.type.label}</p>
+          <p class="type-summary">${result.type.summary}</p>
+          <p class="type-advice">${result.type.advice}</p>
+        </div>
+        <div class="subscales is-profile">
+          ${result.axes.map(a => `
+            <div class="sub-row">
+              <span class="sub-name">${a.label}</span>
+              <span class="sub-meter"><span style="width:${Math.round((a.score / a.max) * 100)}%"></span></span>
+              <span class="sub-score">${a.score}<small>/${a.max}</small></span>
+              <span class="sub-level">${a.high ? '높음' : '낮음'}</span>
+            </div>
+            <p class="sub-desc">${a.desc}</p>`).join('')}
         </div>`;
     }
 
@@ -308,8 +440,9 @@
       <div class="quiz-result tone-${band.tone}">
         <p class="result-kicker">${current.label} 결과</p>
         ${renderScoreBlock(current, result, band)}
-        <p class="result-summary">${text.summary}</p>
-        <p class="result-advice">${text.advice}</p>
+        ${text.summary ? `<p class="result-summary">${text.summary}</p>` : ''}
+        ${text.advice ? `<p class="result-advice">${text.advice}</p>` : ''}
+        ${current.outro ? `<p class="result-outro">${current.outro}</p>` : ''}
         ${current.footnote ? `<p class="result-footnote">${current.footnote}</p>` : ''}
 
         ${showAlert ? `
@@ -333,7 +466,7 @@
         <div class="result-more">
           <p>다른 검사도 해보시겠어요?</p>
           <div class="more-chips">
-            ${SCREENINGS
+            ${ALL_TESTS
               .filter(t => t.id !== current.id)
               .sort((a, b) => (a.category === current.category ? -1 : 0) - (b.category === current.category ? -1 : 0))
               .slice(0, 5)

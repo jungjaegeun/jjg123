@@ -100,8 +100,10 @@ const CATEGORIES = [
   { id: 'all',   label: '전체' },
   { id: 'mood',  label: '우울 · 기분' },
   { id: 'anx',   label: '불안 · 스트레스' },
-  { id: 'sleep', label: '수면 · 집중' },
-  { id: 'life',  label: '웰빙 · 생활' }
+  { id: 'sleep', label: '수면 · 주의력' },
+  { id: 'life',  label: '웰빙 · 생활' },
+  { id: 'trait', label: '성격 · 성향' },
+  { id: 'focus', label: '집중력 과제' }
 ];
 
 const SCREENINGS = [
@@ -732,8 +734,41 @@ const SCREENINGS = [
 ];
 
 /* ══════════════════════════════════════════════════════════ 채점 ════════ */
+function sumItems(answers, items, reverse, revMax) {
+  return items.reduce((acc, i) =>
+    acc + ((reverse || []).includes(i) ? revMax - answers[i] : answers[i]), 0);
+}
+
 function scoreScreening(test, answers) {
   const s = test.scoring;
+
+  /* 성향 프로파일: 차원별 점수와 높음/보통/낮음 (성격·투자 성향) */
+  if (s.type === 'profile') {
+    const groups = s.groups.map(g => {
+      const raw = sumItems(answers, g.items, g.reverse, s.reverseMax);
+      return { ...g, score: raw, level: g.levels.find(l => raw <= l.max) || g.levels[g.levels.length - 1] };
+    });
+    const top = groups.reduce((a, g) => (g.score / g.max > a.score / a.max ? g : a), groups[0]);
+    return { groups, top, score: top.score, max: top.max };
+  }
+
+  /* 유형 선택: 점수가 가장 높은 유형 (에니어그램·직업흥미) */
+  if (s.type === 'types') {
+    const ranked = s.types
+      .map(t => ({ ...t, score: sumItems(answers, t.items, t.reverse, s.reverseMax), max: t.items.length * s.itemMax }))
+      .sort((a, b) => b.score - a.score);
+    return { ranked, top: ranked[0], score: ranked[0].score, max: ranked[0].max };
+  }
+
+  /* 두 축의 조합으로 유형 결정 (애착 유형) */
+  if (s.type === 'axes') {
+    const axes = s.axes.map(a => {
+      const raw = sumItems(answers, a.items, a.reverse, s.reverseMax);
+      return { ...a, score: raw, high: raw >= a.threshold };
+    });
+    const key = axes.map(a => (a.high ? '1' : '0')).join('');
+    return { axes, type: s.matrix[key], score: axes[0].score, max: axes[0].max };
+  }
 
   if (s.type === 'threshold') {
     const count = answers.reduce((acc, v, i) => acc + (v >= s.thresholds[i] ? 1 : 0), 0);
@@ -765,8 +800,14 @@ function scoreScreening(test, answers) {
 }
 
 function bandFor(test, score) {
+  /* 성향·유형 검사는 심각도 등급이 없으므로 중립 밴드를 씁니다 */
+  const t = test.scoring.type;
+  if (t === 'profile') return { level: score.top.label + ' 우세', tone: 'neutral' };
+  if (t === 'types')   return { level: score.top.label, tone: 'neutral' };
+  if (t === 'axes')    return { level: score.type.label, tone: 'neutral' };
+
   /* 하위 척도형은 상위 bands 가 없고, 가장 심한 하위 척도의 밴드를 대표로 씁니다 */
-  if (test.scoring.type === 'subscales') return score.worst.band;
+  if (t === 'subscales') return score.worst.band;
 
   if (test.scoring.type === 'mdq') return test.bands[score.flag ? 1 : 0];
 

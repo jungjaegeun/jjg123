@@ -11,8 +11,8 @@ const read = p => fs.readFileSync(path.join(root, p), 'utf8');
 
 let html = read('index.html');
 const css = read('assets/css/styles.css');
-const jsScreenings = read('assets/js/screenings.js');
-const jsMain = read('assets/js/main.js');
+const scripts = ['assets/js/screenings.js', 'assets/js/profiles.js',
+                 'assets/js/tasks.js', 'assets/js/main.js'].map(read).join('\n');
 
 /* 치환값을 함수로 넘깁니다. 문자열로 넘기면 코드 안의 `$$`, `$&` 등이
    replace() 의 특수 패턴으로 해석되어 소스가 깨집니다. */
@@ -22,8 +22,11 @@ html = html
     () => `<style>\n${css}\n</style>`
   )
   .replace(
-    '<script src="assets/js/screenings.js"></script>\n<script src="assets/js/main.js"></script>',
-    () => `<script>\n${jsScreenings}\n${jsMain}\n</script>`
+    '<script src="assets/js/screenings.js"></script>\n' +
+    '<script src="assets/js/profiles.js"></script>\n' +
+    '<script src="assets/js/tasks.js"></script>\n' +
+    '<script src="assets/js/main.js"></script>',
+    () => `<script>\n${scripts}\n</script>`
   );
 
 /* assets/img/ 안의 이미지는 data: URI 로 심어 넣습니다.

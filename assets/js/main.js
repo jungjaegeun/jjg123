@@ -121,7 +121,7 @@
         <article class="test-card">
           <div class="test-top">
             <span class="test-ico" aria-hidden="true">${t.emoji}</span>
-            <span class="test-scale">${t.scale}</span>
+            <span class="test-scale">${t.label}</span>
           </div>
           <h3>${t.title}</h3>
           <p class="test-tag">${t.tagline}</p>
@@ -185,7 +185,7 @@
     answers = new Array(current.questions.length).fill(null);
     step = 0;
     titleEl.textContent = current.title;
-    kickerEl.textContent = `${current.scale} · ${current.questions.length}문항`;
+    kickerEl.textContent = `${current.label} · ${current.questions.length}문항`;
     openOverlay();
     renderStep();
   }
@@ -306,7 +306,7 @@
 
     bodyEl.innerHTML = `
       <div class="quiz-result tone-${band.tone}">
-        <p class="result-kicker">${current.scale} 결과</p>
+        <p class="result-kicker">${current.label} 결과</p>
         ${renderScoreBlock(current, result, band)}
         <p class="result-summary">${text.summary}</p>
         <p class="result-advice">${text.advice}</p>

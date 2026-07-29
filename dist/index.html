@@ -690,7 +690,7 @@ button {
 .result-advice { margin-top: 10px; font-size: .94rem; color: var(--text-soft); line-height: 1.72; }
 .result-footnote { margin-top: 12px; font-size: .82rem; color: var(--muted); }
 
-/* DASS-21 하위 척도 */
+/* 하위 척도 막대 (통합 척도 결과) */
 .subscales { margin-top: 20px; display: grid; gap: 12px; }
 .sub-row {
   display: grid; align-items: center; gap: 10px;
@@ -707,7 +707,7 @@ button {
 .sub-score small { font-size: .74rem; font-weight: 500; color: var(--muted); }
 .sub-level { font-size: .78rem; font-weight: 600; color: currentColor; text-align: right; }
 
-/* MDQ 판정 */
+/* 선별 기준 충족 여부 배지 (기분 변동 선별) */
 .mdq-verdict {
   display: inline-block; margin-top: 14px;
   padding: 10px 22px; border-radius: var(--r-full);
@@ -1234,14 +1234,16 @@ button {
 /* =========================================================================
  * 수원숲 정신건강의학과 — 자가진단 척도 데이터
  *
- * 임상·연구에서 널리 쓰이는 공개 선별 척도를 한국어 문항으로 담았습니다.
+ * 임상·연구에서 널리 쓰이는 공개 선별 도구를 한국어 문항으로 담았습니다.
  * 모두 진단 도구가 아닌 선별(screening) 참고용입니다.
+ * 화면에는 원 척도명을 노출하지 않습니다. 어떤 검사가 어떤 척도에 해당하는지는
+ * 저장소의 README.md 표를 참고하세요.
  *
  * 채점 방식은 scoring.type 으로 구분합니다.
  *   sum        총점 합산 (reverse 로 역채점 문항 지정)
- *   threshold  문항별 기준값을 넘은 개수 (ASRS)
- *   subscales  하위 척도별 점수 (DASS-21)
- *   mdq        기분장애 질문지 전용 (증상 수 + 동시성 + 기능 손상)
+ *   threshold  문항별 기준값을 넘은 개수
+ *   subscales  하위 척도별 점수 (영역별로 따로 채점)
+ *   mdq        기분 변동 선별 전용 (증상 수 + 동시성 + 기능 손상)
  * ========================================================================= */
 
 /* 자주 쓰이는 응답 보기 ---------------------------------------------------- */
@@ -1276,14 +1278,14 @@ const SEVERITY_5 = [
   { label: '매우 심함', value: 4 }
 ];
 
-const CESD_4 = [
+const DAYS_4 = [
   { label: '극히 드물다', desc: '1일 미만', value: 0 },
   { label: '가끔 있었다', desc: '1–2일', value: 1 },
   { label: '종종 있었다', desc: '3–4일', value: 2 },
   { label: '대부분 그랬다', desc: '5–7일', value: 3 }
 ];
 
-const PCL_5 = [
+const INTENSITY_5 = [
   { label: '전혀 아니다', value: 0 },
   { label: '조금', value: 1 },
   { label: '중간 정도', value: 2 },
@@ -1291,14 +1293,14 @@ const PCL_5 = [
   { label: '극심하게', value: 4 }
 ];
 
-const DASS_4 = [
+const APPLY_4 = [
   { label: '전혀 해당되지 않음', value: 0 },
   { label: '어느 정도 해당됨', value: 1 },
   { label: '상당히 해당됨', value: 2 },
   { label: '매우 많이 해당됨', value: 3 }
 ];
 
-const OCI_5 = [
+const DISTRESS_5 = [
   { label: '전혀 아니다', value: 0 },
   { label: '약간 그렇다', value: 1 },
   { label: '보통이다', value: 2 },
@@ -1306,8 +1308,8 @@ const OCI_5 = [
   { label: '매우 많이 그렇다', value: 4 }
 ];
 
-/* AUDIT 4–8번 공통 보기 */
-const AUDIT_FREQ = [
+/* 음주 선별 4–8번 공통 보기 */
+const DRINK_FREQ = [
   { label: '전혀 없음', value: 0 },
   { label: '월 1회 미만', value: 1 },
   { label: '월 1회 정도', value: 2 },
@@ -1315,7 +1317,7 @@ const AUDIT_FREQ = [
   { label: '거의 매일', value: 4 }
 ];
 
-const AUDIT_YN = [
+const PAST_YEAR_3 = [
   { label: '없다', value: 0 },
   { label: '있지만 지난 1년간은 없다', value: 2 },
   { label: '지난 1년간 있었다', value: 4 }
@@ -1342,7 +1344,7 @@ const SCREENINGS = [
     category: 'mood',
     emoji: '🌧️',
     title: '우울 자가진단',
-    scale: 'PHQ-9',
+    label: '우울 선별',
     tagline: '지난 2주간의 우울 증상',
     blurb: '가장 널리 쓰이는 우울 선별 척도입니다. 기분, 수면, 식욕, 집중력 등 9가지 영역을 확인합니다.',
     minutes: 2,
@@ -1385,12 +1387,12 @@ const SCREENINGS = [
     category: 'mood',
     emoji: '🌫️',
     title: '일상 우울감 검사',
-    scale: 'CES-D',
+    label: '우울감 척도',
     tagline: '지난 일주일간의 기분',
     blurb: '지역사회 연구에서 널리 쓰이는 우울 척도입니다. 병원 진단보다 “요즘 내 기분이 어떤지”를 폭넓게 살펴봅니다.',
     minutes: 4,
     prompt: '지난 <strong>일주일 동안</strong> 다음과 같이 느끼거나 행동한 날이 며칠이나 되었나요?',
-    options: CESD_4,
+    options: DAYS_4,
     scoring: { type: 'sum', max: 60, reverse: [3, 7, 11, 15], reverseMax: 3 },
     questions: [
       '평소에는 아무렇지도 않던 일들이 귀찮게 느껴졌다',
@@ -1423,7 +1425,7 @@ const SCREENINGS = [
         advice: '수면과 활동량부터 챙겨보세요. 2주 이상 계속되면 상담을 고려해 보시길 권합니다.' },
       { max: 24, level: '중등도 우울감', tone: 'moderate',
         summary: '주의가 필요한 수준의 우울감입니다.',
-        advice: 'PHQ-9 검사도 함께 해보시고, 결과가 비슷하다면 전문의 상담을 받아보세요.' },
+        advice: '우울 자가진단도 함께 해보시고, 결과가 비슷하다면 전문의 상담을 받아보세요.' },
       { max: 60, level: '심한 우울감', tone: 'severe',
         summary: '우울감이 상당히 높은 상태입니다.',
         advice: '전문의 진료를 권해드립니다. 혼자 판단하지 마시고 한 번 이야기 나눠보세요.' }
@@ -1435,7 +1437,7 @@ const SCREENINGS = [
     category: 'mood',
     emoji: '🌊',
     title: '조울(양극성) 자가진단',
-    scale: 'MDQ',
+    label: '기분 변동 선별',
     tagline: '지금까지 살아오면서',
     blurb: '기분이 지나치게 들뜨거나 과하게 활동적이었던 시기가 있었는지 확인합니다. 우울 치료가 잘 듣지 않을 때 특히 중요합니다.',
     minutes: 3,
@@ -1481,7 +1483,7 @@ const SCREENINGS = [
     category: 'mood',
     emoji: '🍼',
     title: '산후 우울 자가진단',
-    scale: 'EPDS',
+    label: '산후 우울 선별',
     tagline: '출산 전후 지난 7일간',
     blurb: '임신 중이거나 출산한 지 얼마 되지 않은 분을 위한 척도입니다. 산후 우울은 흔하고 치료가 잘 됩니다.',
     minutes: 3,
@@ -1540,7 +1542,7 @@ const SCREENINGS = [
     category: 'anx',
     emoji: '💓',
     title: '불안 자가진단',
-    scale: 'GAD-7',
+    label: '불안 선별',
     tagline: '지난 2주간의 불안 증상',
     blurb: '걱정, 초조, 긴장 등 범불안 증상을 7문항으로 선별합니다. 공황·사회불안의 실마리도 확인할 수 있습니다.',
     minutes: 2,
@@ -1577,7 +1579,7 @@ const SCREENINGS = [
     category: 'anx',
     emoji: '🔥',
     title: '스트레스 자가진단',
-    scale: 'PSS-10',
+    label: '스트레스 척도',
     tagline: '지난 한 달간 느낀 스트레스',
     blurb: '상황 자체가 아니라 “내가 얼마나 감당하기 어렵게 느꼈는지”를 측정하는 지각된 스트레스 척도입니다.',
     minutes: 3,
@@ -1617,12 +1619,12 @@ const SCREENINGS = [
     category: 'anx',
     emoji: '🧭',
     title: '우울 · 불안 · 스트레스 통합검사',
-    scale: 'DASS-21',
+    label: '통합 척도',
     tagline: '세 가지를 한 번에',
     blurb: '우울·불안·스트레스를 각각 따로 점수로 보여줍니다. 어느 쪽이 더 힘든 상태인지 구분할 때 유용합니다.',
     minutes: 4,
     prompt: '지난 <strong>일주일 동안</strong> 다음 내용이 자신에게 얼마나 해당되었나요?',
-    options: DASS_4,
+    options: APPLY_4,
     scoring: {
       type: 'subscales', multiplier: 2,
       groups: [
@@ -1685,7 +1687,7 @@ const SCREENINGS = [
         advice: '아직 일상에 큰 지장을 줄 정도는 아닙니다. 수면·활동량을 먼저 챙기시고, 2주 뒤 다시 확인해 보세요.' },
       moderate: {
         summary: '가장 높은 영역이 중등도 수준입니다.',
-        advice: '가장 높게 나온 영역에 맞춰 개별 검사(PHQ-9·GAD-7·PSS-10)를 함께 해보시고, 결과가 비슷하다면 상담을 권합니다.' },
+        advice: '가장 높게 나온 영역에 맞춰 개별 검사(우울·불안·스트레스)를 함께 해보시고, 결과가 비슷하다면 상담을 권합니다.' },
       high: {
         summary: '가장 높은 영역이 심한 수준입니다.',
         advice: '전문의 상담을 권해드립니다. 우울·불안·스트레스는 서로 영향을 주기 때문에 함께 다루는 것이 효과적입니다.' },
@@ -1700,12 +1702,12 @@ const SCREENINGS = [
     category: 'anx',
     emoji: '🫧',
     title: '외상후 스트레스 자가진단',
-    scale: 'PCL-5',
+    label: '외상 반응 선별',
     tagline: '지난 한 달간의 반응',
     blurb: '사고·재난·폭력·상실 등 충격적인 경험 이후 나타나는 반응을 확인합니다. 겪은 일이 있으신 분만 이용하세요.',
     minutes: 4,
     prompt: '살면서 겪은 <strong>가장 충격적이었던 일</strong>을 떠올리며, 지난 <strong>한 달 동안</strong> 다음 문제로 얼마나 괴로웠는지 답해 주세요.',
-    options: PCL_5,
+    options: INTENSITY_5,
     scoring: { type: 'sum', max: 80 },
     questions: [
       '그 사건에 대한 반복적이고 힘든 기억이 떠오름',
@@ -1747,12 +1749,12 @@ const SCREENINGS = [
     category: 'anx',
     emoji: '🔁',
     title: '강박 증상 자가진단',
-    scale: 'OCI-R',
+    label: '강박 선별',
     tagline: '지난 한 달간의 불편감',
     blurb: '확인, 정리, 오염, 반복되는 생각 등 강박 관련 증상 여섯 영역을 살펴봅니다.',
     minutes: 4,
     prompt: '지난 <strong>한 달 동안</strong> 다음 경험 때문에 얼마나 괴롭거나 불편했나요?',
-    options: OCI_5,
+    options: DISTRESS_5,
     scoring: { type: 'sum', max: 72 },
     questions: [
       '물건을 모아두어서 주변이 어지럽다',
@@ -1793,7 +1795,7 @@ const SCREENINGS = [
     category: 'sleep',
     emoji: '🌙',
     title: '불면증 자가진단',
-    scale: 'ISI',
+    label: '수면 척도',
     tagline: '최근 2주간의 수면',
     blurb: '잠드는 데 걸리는 시간, 유지, 새벽 각성과 낮 동안의 영향까지 7문항으로 평가합니다.',
     minutes: 2,
@@ -1842,9 +1844,9 @@ const SCREENINGS = [
     category: 'sleep',
     emoji: '🧩',
     title: '성인 ADHD 자가진단',
-    scale: 'ASRS-v1.1 (Part A)',
+    label: '주의력 선별',
     tagline: '지난 6개월간의 주의력·충동성',
-    blurb: 'WHO 성인 ADHD 자기보고 척도의 선별 6문항입니다. 총점이 아니라 문항별 기준 초과 개수로 판단합니다.',
+    blurb: '성인 주의력 문제를 가려내는 선별 6문항입니다. 총점이 아니라 문항별 기준을 넘은 개수로 판단합니다.',
     minutes: 2,
     prompt: '지난 <strong>6개월 동안</strong> 다음과 같은 일이 얼마나 자주 있었나요?',
     options: FREQ_5,
@@ -1876,7 +1878,7 @@ const SCREENINGS = [
     category: 'life',
     emoji: '☀️',
     title: '마음 웰빙 지수',
-    scale: 'WHO-5',
+    label: '웰빙 지수',
     tagline: '지난 2주간의 삶의 활력',
     blurb: '증상을 묻는 대신 “요즘 얼마나 잘 지내고 있는지”를 봅니다. 5문항으로 1분이면 끝납니다.',
     minutes: 1,
@@ -1903,7 +1905,7 @@ const SCREENINGS = [
     bands: [
       { max: 28, level: '웰빙 매우 저하', tone: 'severe',
         summary: '삶의 활력이 크게 떨어져 있습니다. 우울 상태가 동반되었을 가능성이 높습니다.',
-        advice: 'PHQ-9 우울 검사를 함께 해보시고, 전문의 상담을 받아보시길 권합니다.' },
+        advice: '우울 자가진단을 함께 해보시고, 전문의 상담을 받아보시길 권합니다.' },
       { max: 50, level: '웰빙 저하', tone: 'moderate',
         summary: '평균보다 낮은 웰빙 수준입니다.',
         advice: '수면·햇빛·가벼운 운동·사람과의 만남 중 지금 가장 부족한 하나부터 채워보세요.' },
@@ -1921,9 +1923,9 @@ const SCREENINGS = [
     category: 'life',
     emoji: '🍺',
     title: '음주 습관 자가진단',
-    scale: 'AUDIT',
+    label: '음주 선별',
     tagline: '지난 1년간의 음주',
-    blurb: '세계보건기구(WHO)가 만든 음주 문제 선별 검사입니다. 술이 스트레스 대처 수단이 되고 있는지 확인해 보세요.',
+    blurb: '음주 습관이 건강과 일상에 부담을 주고 있는지 확인합니다. 술이 스트레스 대처 수단이 되고 있는지 살펴보세요.',
     minutes: 3,
     prompt: '평소 음주 습관과 <strong>지난 1년간</strong>의 경험을 기준으로 답해 주세요.',
     options: null,
@@ -1935,14 +1937,14 @@ const SCREENINGS = [
       { text: '술을 마시는 날에는 보통 몇 잔을 마십니까? <small>(소주·맥주 등 한 잔 기준)</small>', options: [
         { label: '1~2잔', value: 0 }, { label: '3~4잔', value: 1 },
         { label: '5~6잔', value: 2 }, { label: '7~9잔', value: 3 }, { label: '10잔 이상', value: 4 } ] },
-      { text: '한 번에 소주 1병(또는 맥주 4캔) 이상 마시는 경우가 얼마나 자주 있습니까?', options: AUDIT_FREQ },
-      { text: '지난 1년간, 술을 한번 마시기 시작하면 멈출 수 없었던 적이 얼마나 자주 있었습니까?', options: AUDIT_FREQ },
-      { text: '지난 1년간, 술 때문에 일상적으로 해야 할 일을 하지 못한 적이 얼마나 있었습니까?', options: AUDIT_FREQ },
-      { text: '지난 1년간, 과음한 다음 날 해장술을 마신 적이 얼마나 있었습니까?', options: AUDIT_FREQ },
-      { text: '지난 1년간, 음주 후 죄책감이나 후회를 느낀 적이 얼마나 있었습니까?', options: AUDIT_FREQ },
-      { text: '지난 1년간, 음주 때문에 전날 밤 일이 기억나지 않은 적이 얼마나 있었습니까?', options: AUDIT_FREQ },
-      { text: '음주 때문에 자신이나 다른 사람이 다친 적이 있습니까?', options: AUDIT_YN },
-      { text: '가족·친구·의사가 당신의 음주를 걱정하거나 술을 줄이라고 권한 적이 있습니까?', options: AUDIT_YN }
+      { text: '한 번에 소주 1병(또는 맥주 4캔) 이상 마시는 경우가 얼마나 자주 있습니까?', options: DRINK_FREQ },
+      { text: '지난 1년간, 술을 한번 마시기 시작하면 멈출 수 없었던 적이 얼마나 자주 있었습니까?', options: DRINK_FREQ },
+      { text: '지난 1년간, 술 때문에 일상적으로 해야 할 일을 하지 못한 적이 얼마나 있었습니까?', options: DRINK_FREQ },
+      { text: '지난 1년간, 과음한 다음 날 해장술을 마신 적이 얼마나 있었습니까?', options: DRINK_FREQ },
+      { text: '지난 1년간, 음주 후 죄책감이나 후회를 느낀 적이 얼마나 있었습니까?', options: DRINK_FREQ },
+      { text: '지난 1년간, 음주 때문에 전날 밤 일이 기억나지 않은 적이 얼마나 있었습니까?', options: DRINK_FREQ },
+      { text: '음주 때문에 자신이나 다른 사람이 다친 적이 있습니까?', options: PAST_YEAR_3 },
+      { text: '가족·친구·의사가 당신의 음주를 걱정하거나 술을 줄이라고 권한 적이 있습니까?', options: PAST_YEAR_3 }
     ],
     bands: [
       { max: 7, level: '정상 음주', tone: 'good',
@@ -2133,7 +2135,7 @@ function questionOf(test, index) {
         <article class="test-card">
           <div class="test-top">
             <span class="test-ico" aria-hidden="true">${t.emoji}</span>
-            <span class="test-scale">${t.scale}</span>
+            <span class="test-scale">${t.label}</span>
           </div>
           <h3>${t.title}</h3>
           <p class="test-tag">${t.tagline}</p>
@@ -2197,7 +2199,7 @@ function questionOf(test, index) {
     answers = new Array(current.questions.length).fill(null);
     step = 0;
     titleEl.textContent = current.title;
-    kickerEl.textContent = `${current.scale} · ${current.questions.length}문항`;
+    kickerEl.textContent = `${current.label} · ${current.questions.length}문항`;
     openOverlay();
     renderStep();
   }
@@ -2318,7 +2320,7 @@ function questionOf(test, index) {
 
     bodyEl.innerHTML = `
       <div class="quiz-result tone-${band.tone}">
-        <p class="result-kicker">${current.scale} 결과</p>
+        <p class="result-kicker">${current.label} 결과</p>
         ${renderScoreBlock(current, result, band)}
         <p class="result-summary">${text.summary}</p>
         <p class="result-advice">${text.advice}</p>

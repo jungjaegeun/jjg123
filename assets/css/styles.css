@@ -674,7 +674,7 @@ button {
 .result-advice { margin-top: 10px; font-size: .94rem; color: var(--text-soft); line-height: 1.72; }
 .result-footnote { margin-top: 12px; font-size: .82rem; color: var(--muted); }
 
-/* DASS-21 하위 척도 */
+/* 하위 척도 막대 (통합 척도 결과) */
 .subscales { margin-top: 20px; display: grid; gap: 12px; }
 .sub-row {
   display: grid; align-items: center; gap: 10px;
@@ -691,7 +691,7 @@ button {
 .sub-score small { font-size: .74rem; font-weight: 500; color: var(--muted); }
 .sub-level { font-size: .78rem; font-weight: 600; color: currentColor; text-align: right; }
 
-/* MDQ 판정 */
+/* 선별 기준 충족 여부 배지 (기분 변동 선별) */
 .mdq-verdict {
   display: inline-block; margin-top: 14px;
   padding: 10px 22px; border-radius: var(--r-full);

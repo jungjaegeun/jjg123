@@ -262,7 +262,7 @@
         </div>
 
         <div class="result-actions">
-          <a class="btn btn-primary" href="tel:031-000-0000">전화로 진료 예약</a>
+          <a class="btn btn-primary" href="tel:031-548-1903">전화로 진료 예약</a>
           <button class="btn btn-soft" type="button" data-retry>다시 검사하기</button>
           <button class="btn btn-ghost" type="button" data-close>닫기</button>
         </div>

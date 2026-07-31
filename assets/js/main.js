@@ -238,6 +238,7 @@
 
     bodyEl.innerHTML = `
       <div class="quiz-result tone-${r.tone}">
+        ${quokkaFor(r.tone)}
         <p class="result-kicker">${current.label} 결과</p>
         <div class="result-score"><span class="score-num">${r.headline}</span></div>
         <p class="result-label">${r.sub}</p>
@@ -276,7 +277,12 @@
     bodyEl.innerHTML = `
       <div class="quiz-step">
         <p class="quiz-prompt">${current.prompt}</p>
-        <p class="quiz-count">${step + 1} <span>/ ${total}</span></p>
+        <div class="quiz-count-row">
+          <p class="quiz-count">${step + 1} <span>/ ${total}</span></p>
+          <svg class="quokka-step" viewBox="0 0 200 200" aria-hidden="true">
+            <use href="#quokka-${step / total > .6 ? 'smile' : 'happy'}"/>
+          </svg>
+        </div>
         <h3 class="quiz-q">${q.text}</h3>
         <div class="quiz-options" role="radiogroup" aria-label="응답 선택">
           ${q.options.map((o, i) => `
@@ -317,6 +323,16 @@
     const opts = $$('.quiz-opt', bodyEl);
     if (n >= 1 && n <= opts.length) opts[n - 1].click();
   });
+
+  /* 결과 등급에 맞는 숲이 표정 */
+  const QUOKKA_FACE = {
+    good: 'smile', mild: 'happy', moderate: 'happy',
+    high: 'worry', severe: 'worry', neutral: 'wink'
+  };
+  const quokkaFor = tone =>
+    `<svg class="quokka-result" viewBox="0 0 200 200" aria-hidden="true">
+       <use href="#quokka-${QUOKKA_FACE[tone] || 'happy'}"/>
+     </svg>`;
 
   /* 검사 유형별 점수 표시 영역 */
   function renderScoreBlock(test, result, band) {
@@ -438,6 +454,7 @@
 
     bodyEl.innerHTML = `
       <div class="quiz-result tone-${band.tone}">
+        ${quokkaFor(band.tone)}
         <p class="result-kicker">${current.label} 결과</p>
         ${renderScoreBlock(current, result, band)}
         ${text.summary ? `<p class="result-summary">${text.summary}</p>` : ''}

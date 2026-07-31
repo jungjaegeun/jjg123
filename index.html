@@ -19,6 +19,68 @@
 <body>
 <a class="skip-link" href="#main">본문 바로가기</a>
 
+<!-- ═══════════════════════════════════════════════════════════════════
+     쿼카 캐릭터 '숲이' — 아래에서 <use href="#q-…"> 로 재사용합니다.
+     몸통·머리는 공통이고 눈(표정)만 바꿔 끼웁니다.
+     ═══════════════════════════════════════════════════════════════ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+  <g id="q-body">
+    <path d="M134 178 C 154 176 162 164 158 150" fill="none" stroke="#B4906C" stroke-width="15" stroke-linecap="round"/>
+    <path d="M100 108 C 128 108 142 132 142 154 C 142 174 124 186 100 186 C 76 186 58 174 58 154 C 58 132 72 108 100 108 Z" fill="#C9A582"/>
+    <ellipse cx="100" cy="158" rx="27" ry="25" fill="#EFE0CD"/>
+    <ellipse cx="72"  cy="150" rx="10" ry="14" fill="#BB9271" transform="rotate(-12 72 150)"/>
+    <ellipse cx="128" cy="150" rx="10" ry="14" fill="#BB9271" transform="rotate(12 128 150)"/>
+    <path d="M62 178 C 62 170 70 166 78 168 L 90 176 C 94 179 92 185 87 185 L 70 185 C 65 185 62 182 62 178 Z" fill="#BB9271"/>
+    <path d="M138 178 C 138 170 130 166 122 168 L 110 176 C 106 179 108 185 113 185 L 130 185 C 135 185 138 182 138 178 Z" fill="#BB9271"/>
+  </g>
+  <g id="q-head">
+    <ellipse cx="66"  cy="40" rx="15" ry="14" fill="#C9A582"/>
+    <ellipse cx="134" cy="40" rx="15" ry="14" fill="#C9A582"/>
+    <ellipse cx="66"  cy="41" rx="8"  ry="7.5" fill="#E3A79F"/>
+    <ellipse cx="134" cy="41" rx="8"  ry="7.5" fill="#E3A79F"/>
+    <ellipse cx="100" cy="72" rx="48" ry="42" fill="#C9A582"/>
+    <ellipse cx="100" cy="60" rx="36" ry="26" fill="#D8B896"/>
+    <ellipse cx="58"  cy="88" rx="12" ry="8.5" fill="#F1AEA6" opacity=".85"/>
+    <ellipse cx="142" cy="88" rx="12" ry="8.5" fill="#F1AEA6" opacity=".85"/>
+    <path d="M100 80 C 118 80 127 90 127 100 C 127 110 115 117 100 117 C 85 117 73 110 73 100 C 73 90 82 80 100 80 Z" fill="#F0E2D0"/>
+    <path d="M100 85 c 7 0 10.5 4 10.5 7 c 0 4 -5 6.5 -10.5 6.5 s -10.5 -2.5 -10.5 -6.5 c 0 -3 3.5 -7 10.5 -7 z" fill="#5C4638"/>
+    <path d="M100 98 v 5" stroke="#5C4638" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M82 101 C 87 114 113 114 118 101" fill="none" stroke="#5C4638" stroke-width="3" stroke-linecap="round"/>
+    <g fill="#C6A98F">
+      <circle cx="84" cy="97" r="1.5"/><circle cx="81" cy="103" r="1.5"/>
+      <circle cx="116" cy="97" r="1.5"/><circle cx="119" cy="103" r="1.5"/>
+    </g>
+  </g>
+  <g id="q-eyes-happy">
+    <circle cx="76" cy="66" r="8.5" fill="#3B2F27"/><circle cx="124" cy="66" r="8.5" fill="#3B2F27"/>
+    <circle cx="79" cy="63" r="3.2" fill="#fff"/><circle cx="127" cy="63" r="3.2" fill="#fff"/>
+  </g>
+  <g id="q-eyes-smile">
+    <path d="M67 68 q 9 -13 18 0"  fill="none" stroke="#3B2F27" stroke-width="4.6" stroke-linecap="round"/>
+    <path d="M115 68 q 9 -13 18 0" fill="none" stroke="#3B2F27" stroke-width="4.6" stroke-linecap="round"/>
+  </g>
+  <g id="q-eyes-worry">
+    <circle cx="76" cy="68" r="8" fill="#3B2F27"/><circle cx="124" cy="68" r="8" fill="#3B2F27"/>
+    <circle cx="79" cy="65" r="3" fill="#fff"/><circle cx="127" cy="65" r="3" fill="#fff"/>
+    <path d="M66 57 C 73 53 81 50 88 49"    fill="none" stroke="#5C4638" stroke-width="3" stroke-linecap="round"/>
+    <path d="M134 57 C 127 53 119 50 112 49" fill="none" stroke="#5C4638" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <g id="q-eyes-wink">
+    <path d="M67 68 q 9 -13 18 0" fill="none" stroke="#3B2F27" stroke-width="4.6" stroke-linecap="round"/>
+    <circle cx="124" cy="66" r="8.5" fill="#3B2F27"/><circle cx="127" cy="63" r="3.2" fill="#fff"/>
+  </g>
+  <g id="q-leaf">
+    <path d="M0 0 C -14 -6 -22 -20 -20 -34 C -6 -32 3 -20 0 0 Z" fill="#7BB98E"/>
+    <path d="M0 0 C -6 -12 -12 -22 -19 -31" fill="none" stroke="#5A9E70" stroke-width="1.6" stroke-linecap="round"/>
+  </g>
+
+  <!-- 완성형 심볼: 표정별로 한 번에 쓰기 위한 조합 -->
+  <symbol id="quokka-happy" viewBox="0 0 200 200"><use href="#q-body"/><use href="#q-head"/><use href="#q-eyes-happy"/></symbol>
+  <symbol id="quokka-smile" viewBox="0 0 200 200"><use href="#q-body"/><use href="#q-head"/><use href="#q-eyes-smile"/></symbol>
+  <symbol id="quokka-worry" viewBox="0 0 200 200"><use href="#q-body"/><use href="#q-head"/><use href="#q-eyes-worry"/></symbol>
+  <symbol id="quokka-wink"  viewBox="0 0 200 200"><use href="#q-body"/><use href="#q-head"/><use href="#q-eyes-wink"/></symbol>
+</defs></svg>
+
 <header class="site-header" id="siteHeader">
   <div class="wrap header-inner">
     <a class="brand" href="#top">
@@ -60,6 +122,7 @@
   <section class="hero" id="top">
     <div class="hero-bg" aria-hidden="true"></div>
     <div class="wrap hero-inner">
+     <div class="hero-copy">
       <p class="eyebrow">수원시청역 10번 출구 · 정신건강의학과 전문의 진료</p>
       <h1 class="hero-title">
         마음이 쉬어가는 숲,<br>
@@ -83,6 +146,25 @@
         <li><span aria-hidden="true">🌙</span> 화·목 저녁 7시 30분까지</li>
         <li><span aria-hidden="true">🅿️</span> 진료 시 주차 1시간 무료</li>
       </ul>
+     </div>
+
+     <!-- 쿼카 '숲이'가 있는 숲 장면 -->
+     <div class="hero-art" aria-hidden="true">
+       <svg viewBox="0 0 320 300" class="scene">
+         <circle cx="160" cy="140" r="118" fill="var(--accent-soft)"/>
+         <circle cx="252" cy="62"  r="26"  fill="var(--accent-weak)"/>
+         <circle cx="62"  cy="92"  r="16"  fill="var(--accent-weak)"/>
+         <!-- 언덕 -->
+         <path d="M42 258 C 42 214 90 190 160 190 C 230 190 278 214 278 258 Z" fill="var(--accent-weak)"/>
+         <path d="M70 258 C 70 228 110 210 160 210 C 210 210 250 228 250 258 Z" fill="var(--accent)" opacity=".18"/>
+         <!-- 나뭇잎 -->
+         <g transform="translate(74,150) rotate(-24) scale(1.1)"><use href="#q-leaf"/></g>
+         <g transform="translate(258,168) rotate(28) scale(.95)"><use href="#q-leaf"/></g>
+         <g transform="translate(232,110) rotate(14) scale(.7)"><use href="#q-leaf"/></g>
+         <!-- 숲이 -->
+         <use href="#quokka-happy" x="80" y="72" width="160" height="160" class="q-float"/>
+       </svg>
+     </div>
     </div>
   </section>
 
@@ -94,6 +176,7 @@
         <h2>혼자 버티지 않아도 괜찮습니다</h2>
         <p class="sec-desc">아래 중 하나라도 2주 이상 이어진다면, 한 번쯤 이야기 나눠볼 때입니다.</p>
       </header>
+      <svg class="peek-quokka" viewBox="0 0 200 200" aria-hidden="true"><use href="#quokka-worry"/></svg>
       <ul class="signal-grid">
         <li>“이유 없이 자꾸 눈물이 나요”</li>
         <li>“심장이 뛰고 숨이 막힐 것 같아요”</li>
@@ -393,6 +476,7 @@
   <!-- CTA -->
   <section class="cta-band">
     <div class="wrap">
+      <svg class="cta-quokka" viewBox="0 0 200 200" aria-hidden="true"><use href="#quokka-smile"/></svg>
       <h2>오늘 하루도 애쓰셨습니다</h2>
       <p>이야기할 준비가 되셨다면, 편하게 연락 주세요.</p>
       <div class="cta-actions">

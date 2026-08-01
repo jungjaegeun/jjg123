@@ -279,9 +279,7 @@
         <p class="quiz-prompt">${current.prompt}</p>
         <div class="quiz-count-row">
           <p class="quiz-count">${step + 1} <span>/ ${total}</span></p>
-          <svg class="quokka-step" viewBox="0 0 200 200" aria-hidden="true">
-            <use href="#quokka-${step / total > .6 ? 'smile' : 'happy'}"/>
-          </svg>
+          ${quokkaTag(step / total > .6 ? 'smile' : 'happy', 'quokka-step')}
         </div>
         <h3 class="quiz-q">${q.text}</h3>
         <div class="quiz-options" role="radiogroup" aria-label="응답 선택">
@@ -329,10 +327,23 @@
     good: 'smile', mild: 'happy', moderate: 'happy',
     high: 'worry', severe: 'worry', neutral: 'wink'
   };
-  const quokkaFor = tone =>
-    `<svg class="quokka-result" viewBox="0 0 200 200" aria-hidden="true">
-       <use href="#quokka-${QUOKKA_FACE[tone] || 'happy'}"/>
-     </svg>`;
+
+  /* 캐릭터 자리.
+     assets/img/quokka-{표정}.png 이 있으면 그 이미지를 쓰고,
+     없으면 onerror 가 <img> 를 지워 내장 SVG 그림이 드러납니다.
+
+     단일 파일(dist)로 빌드하면 이미지가 data URI 로 바뀌어
+     window.QUOKKA_SRC 에 담겨 오므로, 있으면 그쪽을 먼저 씁니다. */
+  const QUOKKA_SRC = window.QUOKKA_SRC || {};
+  const quokkaSrc = face => QUOKKA_SRC[face] || `assets/img/quokka-${face}.png`;
+
+  const quokkaTag = (face, cls) => `
+    <span class="q-slot ${cls}">
+      <img src="${quokkaSrc(face)}" alt="" onerror="this.remove()">
+      <svg viewBox="0 0 200 200" aria-hidden="true"><use href="#quokka-${face}"/></svg>
+    </span>`;
+
+  const quokkaFor = tone => quokkaTag(QUOKKA_FACE[tone] || 'happy', 'quokka-result');
 
   /* 검사 유형별 점수 표시 영역 */
   function renderScoreBlock(test, result, band) {

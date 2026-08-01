@@ -723,14 +723,31 @@ button {
 .tone-neutral { color: var(--accent); }
 
 /* ─────────────────────────────────────────────── 캐릭터 배치 ─────── */
-.quokka-result { display: block; width: 108px; height: 108px; margin: 0 auto 4px; }
+/* 캐릭터 자리: assets/img/quokka-{표정}.png 가 있으면 이미지를, 없으면 내장 SVG를 씁니다.
+   이미지 로드에 실패하면 onerror 가 <img> 를 지워 바로 뒤의 SVG 가 드러납니다. */
+.q-slot { display: inline-flex; }
+.q-slot > img,
+.q-slot > svg { width: 100%; height: 100%; display: block; }
+.q-slot > img { object-fit: contain; }
+.q-slot > img + svg { display: none; }
+
+.quokka-result { width: 108px; height: 108px; margin: 0 auto 4px; }
+.quiz-result .quokka-result { display: flex; }
 .quokka-step   { width: 46px; height: 46px; flex: none; }
 .quiz-count-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 18px; }
 .quiz-count-row .quiz-count { margin-top: 0; }
 
 .cta-quokka {
-  display: block; width: 96px; height: 96px; margin: 0 auto 12px;
+  width: 96px; height: 96px; margin: 0 auto 12px;
   filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .18));
+}
+.cta-band .cta-quokka { display: flex; }
+
+/* 히어로 장면 위에 겹쳐 놓는 캐릭터 */
+.hero-art { position: relative; }
+.hero-quokka {
+  position: absolute; left: 25%; top: 24%;
+  width: 50%; height: 53%;
 }
 
 /* 섹션 모서리에서 살짝 보이는 캐릭터 */
@@ -1115,9 +1132,12 @@ button {
          <g transform="translate(74,150) rotate(-24) scale(1.1)"><use href="#q-leaf"/></g>
          <g transform="translate(258,168) rotate(28) scale(.95)"><use href="#q-leaf"/></g>
          <g transform="translate(232,110) rotate(14) scale(.7)"><use href="#q-leaf"/></g>
-         <!-- 숲이 -->
-         <use href="#quokka-happy" x="80" y="72" width="160" height="160" class="q-float"/>
        </svg>
+       <!-- 숲이 (이미지 파일이 있으면 그것으로 교체됩니다) -->
+       <span class="q-slot hero-quokka q-float">
+         <img src="assets/img/quokka-happy.png" alt="" onerror="this.remove()">
+         <svg viewBox="0 0 200 200"><use href="#quokka-happy"/></svg>
+       </span>
      </div>
     </div>
   </section>
@@ -1130,7 +1150,10 @@ button {
         <h2>혼자 버티지 않아도 괜찮습니다</h2>
         <p class="sec-desc">아래 중 하나라도 2주 이상 이어진다면, 한 번쯤 이야기 나눠볼 때입니다.</p>
       </header>
-      <svg class="peek-quokka" viewBox="0 0 200 200" aria-hidden="true"><use href="#quokka-worry"/></svg>
+      <span class="q-slot peek-quokka">
+        <img src="assets/img/quokka-worry.png" alt="" onerror="this.remove()">
+        <svg viewBox="0 0 200 200" aria-hidden="true"><use href="#quokka-worry"/></svg>
+      </span>
       <ul class="signal-grid">
         <li>“이유 없이 자꾸 눈물이 나요”</li>
         <li>“심장이 뛰고 숨이 막힐 것 같아요”</li>
@@ -1430,7 +1453,10 @@ button {
   <!-- CTA -->
   <section class="cta-band">
     <div class="wrap">
-      <svg class="cta-quokka" viewBox="0 0 200 200" aria-hidden="true"><use href="#quokka-smile"/></svg>
+      <span class="q-slot cta-quokka">
+        <img src="assets/img/quokka-smile.png" alt="" onerror="this.remove()">
+        <svg viewBox="0 0 200 200" aria-hidden="true"><use href="#quokka-smile"/></svg>
+      </span>
       <h2>오늘 하루도 애쓰셨습니다</h2>
       <p>이야기할 준비가 되셨다면, 편하게 연락 주세요.</p>
       <div class="cta-actions">
@@ -1485,6 +1511,7 @@ button {
 </div>
 
 <script>
+window.QUOKKA_SRC = {};
 /* =========================================================================
  * 수원숲 정신건강의학과 — 자가진단 척도 데이터
  *
@@ -3246,9 +3273,7 @@ const TASK_RUNNERS = { reaction: runReaction, stroop: runStroop, digitspan: runD
         <p class="quiz-prompt">${current.prompt}</p>
         <div class="quiz-count-row">
           <p class="quiz-count">${step + 1} <span>/ ${total}</span></p>
-          <svg class="quokka-step" viewBox="0 0 200 200" aria-hidden="true">
-            <use href="#quokka-${step / total > .6 ? 'smile' : 'happy'}"/>
-          </svg>
+          ${quokkaTag(step / total > .6 ? 'smile' : 'happy', 'quokka-step')}
         </div>
         <h3 class="quiz-q">${q.text}</h3>
         <div class="quiz-options" role="radiogroup" aria-label="응답 선택">
@@ -3296,10 +3321,23 @@ const TASK_RUNNERS = { reaction: runReaction, stroop: runStroop, digitspan: runD
     good: 'smile', mild: 'happy', moderate: 'happy',
     high: 'worry', severe: 'worry', neutral: 'wink'
   };
-  const quokkaFor = tone =>
-    `<svg class="quokka-result" viewBox="0 0 200 200" aria-hidden="true">
-       <use href="#quokka-${QUOKKA_FACE[tone] || 'happy'}"/>
-     </svg>`;
+
+  /* 캐릭터 자리.
+     assets/img/quokka-{표정}.png 이 있으면 그 이미지를 쓰고,
+     없으면 onerror 가 <img> 를 지워 내장 SVG 그림이 드러납니다.
+
+     단일 파일(dist)로 빌드하면 이미지가 data URI 로 바뀌어
+     window.QUOKKA_SRC 에 담겨 오므로, 있으면 그쪽을 먼저 씁니다. */
+  const QUOKKA_SRC = window.QUOKKA_SRC || {};
+  const quokkaSrc = face => QUOKKA_SRC[face] || `assets/img/quokka-${face}.png`;
+
+  const quokkaTag = (face, cls) => `
+    <span class="q-slot ${cls}">
+      <img src="${quokkaSrc(face)}" alt="" onerror="this.remove()">
+      <svg viewBox="0 0 200 200" aria-hidden="true"><use href="#quokka-${face}"/></svg>
+    </span>`;
+
+  const quokkaFor = tone => quokkaTag(QUOKKA_FACE[tone] || 'happy', 'quokka-result');
 
   /* 검사 유형별 점수 표시 영역 */
   function renderScoreBlock(test, result, band) {

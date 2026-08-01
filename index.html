@@ -161,9 +161,12 @@
          <g transform="translate(74,150) rotate(-24) scale(1.1)"><use href="#q-leaf"/></g>
          <g transform="translate(258,168) rotate(28) scale(.95)"><use href="#q-leaf"/></g>
          <g transform="translate(232,110) rotate(14) scale(.7)"><use href="#q-leaf"/></g>
-         <!-- 숲이 -->
-         <use href="#quokka-happy" x="80" y="72" width="160" height="160" class="q-float"/>
        </svg>
+       <!-- 숲이 (이미지 파일이 있으면 그것으로 교체됩니다) -->
+       <span class="q-slot hero-quokka q-float">
+         <img src="assets/img/quokka-happy.png" alt="" onerror="this.remove()">
+         <svg viewBox="0 0 200 200"><use href="#quokka-happy"/></svg>
+       </span>
      </div>
     </div>
   </section>
@@ -176,7 +179,10 @@
         <h2>혼자 버티지 않아도 괜찮습니다</h2>
         <p class="sec-desc">아래 중 하나라도 2주 이상 이어진다면, 한 번쯤 이야기 나눠볼 때입니다.</p>
       </header>
-      <svg class="peek-quokka" viewBox="0 0 200 200" aria-hidden="true"><use href="#quokka-worry"/></svg>
+      <span class="q-slot peek-quokka">
+        <img src="assets/img/quokka-worry.png" alt="" onerror="this.remove()">
+        <svg viewBox="0 0 200 200" aria-hidden="true"><use href="#quokka-worry"/></svg>
+      </span>
       <ul class="signal-grid">
         <li>“이유 없이 자꾸 눈물이 나요”</li>
         <li>“심장이 뛰고 숨이 막힐 것 같아요”</li>
@@ -476,7 +482,10 @@
   <!-- CTA -->
   <section class="cta-band">
     <div class="wrap">
-      <svg class="cta-quokka" viewBox="0 0 200 200" aria-hidden="true"><use href="#quokka-smile"/></svg>
+      <span class="q-slot cta-quokka">
+        <img src="assets/img/quokka-smile.png" alt="" onerror="this.remove()">
+        <svg viewBox="0 0 200 200" aria-hidden="true"><use href="#quokka-smile"/></svg>
+      </span>
       <h2>오늘 하루도 애쓰셨습니다</h2>
       <p>이야기할 준비가 되셨다면, 편하게 연락 주세요.</p>
       <div class="cta-actions">

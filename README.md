@@ -140,9 +140,19 @@ build-single.js         파일 하나(dist/index.html)로 합치는 빌드 스�
 |---|---|---|
 | `assets/img/logo-mark.png` | 상호 글자 앞 그림 마크 (배경 투명) | 글자 로고만 표시 |
 | `assets/img/doctor.jpg` | 의료진 소개 사진 | 의사 일러스트 표시 |
+| `assets/img/quokka-happy.png` | 히어로, 검사 진행 화면 | 코드로 그린 쿼카 |
+| `assets/img/quokka-smile.png` | 예약 배너, 정상 결과 | 코드로 그린 쿼카 |
+| `assets/img/quokka-worry.png` | '이런 마음이라면', 심한 결과 | 코드로 그린 쿼카 |
+| `assets/img/quokka-wink.png` | 성향 검사 결과 | 코드로 그린 쿼카 |
 
 `build-single.js` 가 이 이미지들을 data URI 로 `dist/index.html` 안에 심어 넣으므로,
-파일 하나만 올려도 로고와 사진이 함께 표시됩니다.
+파일 하나만 올려도 로고와 사진, 캐릭터가 함께 표시됩니다.
+
+캐릭터는 HTML 에 직접 쓰인 자리(히어로·배너 등)와 JS 가 만들어내는 자리
+(검사 진행·결과 화면) 양쪽에서 쓰입니다. JS 쪽은 경로를 문자열로 조립하므로
+빌드 시 정규식으로 치환할 수 없어, `build-single.js` 가 표정별 data URI 를
+`window.QUOKKA_SRC` 로 주입하고 `main.js` 가 그 값을 우선 사용합니다.
+이 처리가 없으면 히어로만 사용자 이미지로 바뀌고 결과 화면은 기본 그림이 남습니다.
 
 ## 아직 확인·교체가 필요한 부분
 

@@ -14,6 +14,24 @@ const css = read('assets/css/styles.css');
 const scripts = ['assets/js/screenings.js', 'assets/js/profiles.js',
                  'assets/js/tasks.js', 'assets/js/main.js'].map(read).join('\n');
 
+const MIME = { '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
+               '.gif': 'image/gif', '.webp': 'image/webp', '.svg': 'image/svg+xml' };
+
+/* 결과·진행 화면의 캐릭터는 JS 가 경로를 만들어 쓰므로 정규식으로 바꿀 수 없습니다.
+   표정별 이미지를 data URI 맵으로 만들어 window.QUOKKA_SRC 로 넘겨줍니다.
+   (스크립트를 합치기 전에 준비해야 하므로 여기서 먼저 계산합니다) */
+const quokkaMap = {};
+for (const face of ['happy', 'smile', 'worry', 'wink']) {
+  for (const ext of ['.png', '.svg', '.jpg', '.webp']) {
+    const rel = `assets/img/quokka-${face}${ext}`;
+    const file = path.join(root, rel);
+    if (fs.existsSync(file)) {
+      quokkaMap[face] = `data:${MIME[ext]};base64,${fs.readFileSync(file).toString('base64')}`;
+      break;
+    }
+  }
+}
+
 /* 치환값을 함수로 넘깁니다. 문자열로 넘기면 코드 안의 `$$`, `$&` 등이
    replace() 의 특수 패턴으로 해석되어 소스가 깨집니다. */
 html = html
@@ -26,14 +44,11 @@ html = html
     '<script src="assets/js/profiles.js"></script>\n' +
     '<script src="assets/js/tasks.js"></script>\n' +
     '<script src="assets/js/main.js"></script>',
-    () => `<script>\n${scripts}\n</script>`
+    () => `<script>\nwindow.QUOKKA_SRC = ${JSON.stringify(quokkaMap)};\n${scripts}\n</script>`
   );
 
 /* assets/img/ 안의 이미지는 data: URI 로 심어 넣습니다.
    파일이 없으면 경로를 그대로 두고, 브라우저에서 onerror 가 SVG 대체본을 띄웁니다. */
-const MIME = { '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
-               '.gif': 'image/gif', '.webp': 'image/webp', '.svg': 'image/svg+xml' };
-
 html = html.replace(/src="(assets\/img\/[^"]+)"/g, (whole, rel) => {
   const file = path.join(root, rel);
   if (!fs.existsSync(file)) {
@@ -49,6 +64,7 @@ html = html.replace(/src="(assets\/img\/[^"]+)"/g, (whole, rel) => {
   console.log(`  · ${rel} 삽입 완료 (${(b64.length / 1365).toFixed(0)} KB)`);
   return `src="data:${mime};base64,${b64}"`;
 });
+
 
 /* 남은 참조가 있으면 인라인에 실패한 것입니다 (assets/img 는 위에서 처리했으므로 제외) */
 const leftover = html.match(/(?:href|src)="assets\/(?!img\/)[^"]*"/g);

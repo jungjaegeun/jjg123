@@ -1,0 +1,172 @@
+<meta charset="utf-8">
+<title>쿼카 이미지 배경 지우기</title>
+<style>
+  :root { --g:#2F6B4F; --line:#E2E9E3; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 32px 20px 64px; background: #FAFBF9; color: #16211C;
+    font-family: 'Pretendard', -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    line-height: 1.7; word-break: keep-all;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 1.5rem; margin: 0 0 8px; }
+  .lead { color: #5C6B62; margin: 0 0 24px; font-size: .95rem; }
+  .drop {
+    border: 2px dashed #CFDAD2; border-radius: 18px; background: #fff;
+    padding: 40px 20px; text-align: center; cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .drop.on { border-color: var(--g); background: #EAF3ED; }
+  .drop p { margin: 0; color: #5C6B62; }
+  .drop b { color: var(--g); }
+  input[type=file] { display: none; }
+
+  .ctl { display: flex; align-items: center; gap: 12px; margin: 24px 0 8px; flex-wrap: wrap; }
+  .ctl label { font-size: .88rem; color: #5C6B62; }
+  input[type=range] { width: 220px; accent-color: var(--g); }
+  .val { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--g); }
+
+  .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); margin-top: 20px; }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 14px; text-align: center; }
+  .card .name { font-size: .8rem; color: #6E7F75; margin: 0 0 10px; word-break: break-all; }
+  .previews { display: flex; gap: 8px; }
+  .pv { flex: 1; border-radius: 10px; padding: 6px; }
+  .pv.light { background: #EAF3ED; }
+  .pv.dark  { background: var(--g); }
+  .pv canvas { width: 100%; height: auto; display: block; }
+  select, button {
+    font: inherit; border-radius: 999px; border: 1px solid var(--line);
+    padding: 8px 14px; background: #fff; cursor: pointer;
+  }
+  .card select { width: 100%; margin-top: 10px; font-size: .85rem; }
+  .card button {
+    width: 100%; margin-top: 8px; background: var(--g); color: #fff; border-color: var(--g);
+    font-weight: 600; font-size: .85rem;
+  }
+  .note { margin-top: 28px; font-size: .86rem; color: #6E7F75; background: #fff;
+          border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; }
+  .note b { color: #16211C; }
+</style>
+
+<div class="wrap">
+  <h1>쿼카 이미지 배경 지우기</h1>
+  <p class="lead">
+    흰 배경을 투명하게 바꿔 홈페이지에 넣을 수 있는 PNG로 만들어 줍니다.
+    이미지는 <b>이 브라우저 안에서만</b> 처리되며 어디로도 전송되지 않습니다.
+  </p>
+
+  <label class="drop" id="drop">
+    <input type="file" id="file" accept="image/*" multiple>
+    <p>여기로 이미지를 <b>끌어다 놓거나</b>, 눌러서 선택하세요<br>
+       <small>여러 장을 한 번에 넣어도 됩니다</small></p>
+  </label>
+
+  <div class="ctl">
+    <label for="thr">배경으로 지울 밝기 기준</label>
+    <input type="range" id="thr" min="200" max="255" value="238">
+    <span class="val" id="thrv">238</span>
+    <small style="color:#6E7F75">흰 배경이 남으면 값을 낮추고, 캐릭터가 파이면 값을 높이세요</small>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="note">
+    <p style="margin:0 0 8px"><b>사용 방법</b></p>
+    <p style="margin:0">
+      1. 이미지를 넣고 아래 미리보기에서 밝은 배경·어두운 배경 양쪽을 확인하세요.<br>
+      2. 각 카드에서 쓰임새를 고르고 <b>저장</b>을 누르면 알맞은 파일 이름으로 내려받아집니다.<br>
+      3. 내려받은 파일을 홈페이지 폴더의 <b>assets/img/</b> 안에 넣으면 끝입니다.
+    </p>
+  </div>
+</div>
+
+<script>
+const USES = [
+  ['quokka-happy', '기본 — 히어로·검사 진행 화면'],
+  ['quokka-smile', '활짝 — 예약 배너·정상 결과'],
+  ['quokka-worry', '걱정 — 심한 결과'],
+  ['quokka-wink',  '윙크 — 성격·성향 검사 결과']
+];
+
+const grid = document.getElementById('grid');
+const thr  = document.getElementById('thr');
+const thrv = document.getElementById('thrv');
+const items = [];   // { img, canvases[] }
+
+document.getElementById('file').addEventListener('change', e => add(e.target.files));
+
+const drop = document.getElementById('drop');
+['dragenter', 'dragover'].forEach(t =>
+  drop.addEventListener(t, e => { e.preventDefault(); drop.classList.add('on'); }));
+['dragleave', 'drop'].forEach(t =>
+  drop.addEventListener(t, e => { e.preventDefault(); drop.classList.remove('on'); }));
+drop.addEventListener('drop', e => add(e.dataTransfer.files));
+
+thr.addEventListener('input', () => { thrv.textContent = thr.value; items.forEach(render); });
+
+function add(files) {
+  [...files].filter(f => f.type.startsWith('image/')).forEach(f => {
+    const img = new Image();
+    img.onload = () => {
+      const item = { img, name: f.name, card: makeCard(f.name) };
+      items.push(item);
+      render(item);
+    };
+    img.src = URL.createObjectURL(f);
+  });
+}
+
+function makeCard(name) {
+  const el = document.createElement('div');
+  el.className = 'card';
+  el.innerHTML = `
+    <p class="name">${name}</p>
+    <div class="previews">
+      <div class="pv light"><canvas></canvas></div>
+      <div class="pv dark"><canvas></canvas></div>
+    </div>
+    <select>${USES.map(u => `<option value="${u[0]}">${u[1]}</option>`).join('')}</select>
+    <button type="button">저장</button>`;
+  grid.appendChild(el);
+  return el;
+}
+
+/* 가장자리가 거칠어지지 않도록, 밝기에 따라 투명도를 부드럽게 줍니다 */
+function cut(img, limit) {
+  const c = document.createElement('canvas');
+  c.width = img.naturalWidth; c.height = img.naturalHeight;
+  const ctx = c.getContext('2d');
+  ctx.drawImage(img, 0, 0);
+  const d = ctx.getImageData(0, 0, c.width, c.height);
+  const p = d.data;
+  const soft = 18;                       // 완전 투명 ~ 불투명 사이 구간
+  for (let i = 0; i < p.length; i += 4) {
+    const min = Math.min(p[i], p[i + 1], p[i + 2]);
+    if (min >= limit) { p[i + 3] = 0; }
+    else if (min >= limit - soft) {
+      p[i + 3] = Math.round(p[i + 3] * (limit - min) / soft);
+    }
+  }
+  ctx.putImageData(d, 0, 0);
+  return c;
+}
+
+function render(item) {
+  const out = cut(item.img, Number(thr.value));
+  item.out = out;
+  item.card.querySelectorAll('canvas').forEach(cv => {
+    cv.width = out.width; cv.height = out.height;
+    cv.getContext('2d').drawImage(out, 0, 0);
+  });
+  const btn = item.card.querySelector('button');
+  btn.onclick = () => {
+    const use = item.card.querySelector('select').value;
+    item.out.toBlob(b => {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(b);
+      a.download = use + '.png';
+      a.click();
+    }, 'image/png');
+  };
+}
+</script>

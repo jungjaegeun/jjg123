@@ -13,6 +13,7 @@ assets/js/tasks.js      집중력 과제 3종 (반응 시간 측정, 자체 실�
 assets/js/main.js       테마·네비게이션·검사 진행 UI
 assets/img/             로고·의료진 사진을 넣는 곳 (선택)
 build-single.js         파일 하나(dist/index.html)로 합치는 빌드 스크립트
+tools/배경지우기.html    캐릭터 이미지의 흰 배경을 투명하게 바꾸는 도구 (브라우저에서 실행)
 ```
 
 ## 섹션

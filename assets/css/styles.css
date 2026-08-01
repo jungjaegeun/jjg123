@@ -721,11 +721,16 @@ button {
 .quiz-count-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 18px; }
 .quiz-count-row .quiz-count { margin-top: 0; }
 
+/* 예약 배너는 배경이 진한 초록이라, 캐릭터를 흰 원 안에 담습니다.
+   배경이 흰색인 이미지를 넣어도 자연스럽게 보입니다. */
 .cta-quokka {
-  width: 96px; height: 96px; margin: 0 auto 12px;
-  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .18));
+  width: 108px; height: 108px; margin: 0 auto 14px;
+  padding: 8px; border-radius: 50%;
+  background: #fff; overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .16);
 }
 .cta-band .cta-quokka { display: flex; }
+.cta-quokka > img { border-radius: 50%; }
 
 /* 히어로 장면 위에 겹쳐 놓는 캐릭터 */
 .hero-art { position: relative; }

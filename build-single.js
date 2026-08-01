@@ -1,0 +1,81 @@
+/* -------------------------------------------------------------------------
+ * index.html + assets/* 를 파일 하나(dist/index.html)로 합칩니다.
+ * 실행: node build-single.js
+ * 결과물은 CSS·JS가 모두 안에 들어 있어 이 파일 하나만 올리면 동작합니다.
+ * ----------------------------------------------------------------------- */
+const fs = require('fs');
+const path = require('path');
+
+const root = __dirname;
+const read = p => fs.readFileSync(path.join(root, p), 'utf8');
+
+let html = read('index.html');
+const css = read('assets/css/styles.css');
+const scripts = ['assets/js/screenings.js', 'assets/js/profiles.js',
+                 'assets/js/tasks.js', 'assets/js/main.js'].map(read).join('\n');
+
+const MIME = { '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
+               '.gif': 'image/gif', '.webp': 'image/webp', '.svg': 'image/svg+xml' };
+
+/* 결과·진행 화면의 캐릭터는 JS 가 경로를 만들어 쓰므로 정규식으로 바꿀 수 없습니다.
+   표정별 이미지를 data URI 맵으로 만들어 window.QUOKKA_SRC 로 넘겨줍니다.
+   (스크립트를 합치기 전에 준비해야 하므로 여기서 먼저 계산합니다) */
+const quokkaMap = {};
+for (const face of ['happy', 'smile', 'worry', 'wink']) {
+  for (const ext of ['.png', '.svg', '.jpg', '.webp']) {
+    const rel = `assets/img/quokka-${face}${ext}`;
+    const file = path.join(root, rel);
+    if (fs.existsSync(file)) {
+      quokkaMap[face] = `data:${MIME[ext]};base64,${fs.readFileSync(file).toString('base64')}`;
+      break;
+    }
+  }
+}
+
+/* 치환값을 함수로 넘깁니다. 문자열로 넘기면 코드 안의 `$$`, `$&` 등이
+   replace() 의 특수 패턴으로 해석되어 소스가 깨집니다. */
+html = html
+  .replace(
+    '<link rel="stylesheet" href="assets/css/styles.css">',
+    () => `<style>\n${css}\n</style>`
+  )
+  .replace(
+    '<script src="assets/js/screenings.js"></script>\n' +
+    '<script src="assets/js/profiles.js"></script>\n' +
+    '<script src="assets/js/tasks.js"></script>\n' +
+    '<script src="assets/js/main.js"></script>',
+    () => `<script>\nwindow.QUOKKA_SRC = ${JSON.stringify(quokkaMap)};\n${scripts}\n</script>`
+  );
+
+/* assets/img/ 안의 이미지는 data: URI 로 심어 넣습니다.
+   파일이 없으면 경로를 그대로 두고, 브라우저에서 onerror 가 SVG 대체본을 띄웁니다. */
+html = html.replace(/src="(assets\/img\/[^"]+)"/g, (whole, rel) => {
+  const file = path.join(root, rel);
+  if (!fs.existsSync(file)) {
+    console.warn(`  · ${rel} 없음 → 기본 도형(SVG)으로 표시됩니다`);
+    return whole;
+  }
+  const mime = MIME[path.extname(file).toLowerCase()];
+  if (!mime) {
+    console.warn(`  · ${rel} 지원하지 않는 형식 → 그대로 둠`);
+    return whole;
+  }
+  const b64 = fs.readFileSync(file).toString('base64');
+  console.log(`  · ${rel} 삽입 완료 (${(b64.length / 1365).toFixed(0)} KB)`);
+  return `src="data:${mime};base64,${b64}"`;
+});
+
+
+/* 남은 참조가 있으면 인라인에 실패한 것입니다 (assets/img 는 위에서 처리했으므로 제외) */
+const leftover = html.match(/(?:href|src)="assets\/(?!img\/)[^"]*"/g);
+if (leftover) {
+  console.error('오류: 인라인되지 않은 참조가 남아 있습니다 →', leftover);
+  process.exit(1);
+}
+
+fs.rmSync(path.join(root, 'dist'), { recursive: true, force: true });
+fs.mkdirSync(path.join(root, 'dist'), { recursive: true });
+fs.writeFileSync(path.join(root, 'dist/index.html'), html);
+
+const kb = (Buffer.byteLength(html) / 1024).toFixed(0);
+console.log(`dist/index.html 생성 완료 (${kb} KB)`);
